@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}Pharmacy{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <style>
+    body {
+      display: flex;
+    }
+
+    .sidebar {
+      min-width: 220px;
+      max-width: 220px;
+      height: 100vh;
+      background-color: #343a40;
+      color: white;
+      position: fixed;
+    }
+
+    .sidebar .nav-link {
+      color: #cfd8dc;
+    }
+
+    .sidebar .nav-link:hover {
+      background-color: #495057;
+      color: #fff;
+    }
+
+    .content {
+      margin-left: 220px;
+      padding: 20px;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar d-flex flex-column p-3">
+    <h4 class="text-white mb-4">Pharmacy</h4>
+    <ul class="nav nav-pills flex-column mb-auto">
+      <li class="nav-item">
+        <a href="{% url 'index' %}" class="nav-link">Dashboard</a>
+      </li>
+      <li>
+        <a class="nav-link" data-bs-toggle="collapse" href="#inventoryMenu" role="button" aria-expanded="false"
+          aria-controls="inventoryMenu">
+          Inventory ▾
+        </a>
+        <div class="collapse ps-3" id="inventoryMenu">
+          <ul class="nav flex-column">
+            <li><a href="" class="nav-link">Search Medicine</a></li>
+            <li><a href="{% url 'add_medicine' %}" class="nav-link">Add Medicine</a></li>
+            <!-- <li><a href="" class="nav-link">Remove Medicine</a></li>
+            <li><a href="" class="nav-link">Update Medicine</a></li> -->
+            <li><a href="{% url 'list_medicine' %}" class="nav-link">List Medicine</a></li>
+          </ul>
+        </div>
+      </li>
+
+    </ul>
+    <hr>
+    <div>
+      <a href="/admin" class="btn btn-sm btn-outline-light w-100">⚙️ Admin</a>
+    </div>
+  </div>
+
+  <!-- Page content -->
+  <div class="content">
+    {% block content %}
+    {% endblock %}
+  </div>
