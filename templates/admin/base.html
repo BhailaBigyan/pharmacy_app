@@ -47,25 +47,39 @@
         <a href="{% url 'index' %}" class="nav-link">Dashboard</a>
       </li>
       <li>
-        <a class="nav-link" data-bs-toggle="collapse" href="#inventoryMenu" role="button" aria-expanded="false"
-          aria-controls="inventoryMenu">
-          Inventory ▾
+        <a class="nav-link" data-bs-toggle="collapse" href="#medicineMenu" role="button" aria-expanded="false"
+          aria-controls="medicineMenu">
+          Medicine
         </a>
-        <div class="collapse ps-3" id="inventoryMenu">
+        <div class="collapse ps-3" id="medicineMenu">
           <ul class="nav flex-column">
-            <li><a href="" class="nav-link">Search Medicine</a></li>
             <li><a href="{% url 'add_medicine' %}" class="nav-link">Add Medicine</a></li>
             <!-- <li><a href="" class="nav-link">Remove Medicine</a></li>
             <li><a href="" class="nav-link">Update Medicine</a></li> -->
+            <li><a href="{% url 'edit_page_medicine' %}" class="nav-link">Edit Medicine</a></li>
             <li><a href="{% url 'list_medicine' %}" class="nav-link">List Medicine</a></li>
           </ul>
         </div>
       </li>
-
+      <li>
+        <a class="nav-link" data-bs-toggle="collapse" href="#stockMenu" role="button" aria-expanded="false"
+          aria-controls="stockMenu">
+          Stock
+        </a>
+        <div class="collapse ps-3" id="stockMenu">
+          <ul class="nav flex-column">
+            <li><a href="{% url 'stock_report' %}" class="nav-link">Stock Report</a></li>
+            <!-- <li><a href="" class="nav-link">Remove Medicine</a></li>
+            <li><a href="" class="nav-link">Update Medicine</a></li> -->
+            <li><a href="{% url 'list_medicine' %}" class="nav-link">Available Stock</a></li>
+          </ul>
+        </div>
+      </li>
     </ul>
     <hr>
     <div>
       <a href="/admin" class="btn btn-sm btn-outline-light w-100">⚙️ Admin</a>
+      <a href="{% url 'logout' %}" class="btn btn-sm btn-outline-light w-100 mt-2">🚪 Logout</a>
     </div>
   </div>
 

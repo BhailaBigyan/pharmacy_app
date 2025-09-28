@@ -1,7 +1,41 @@
 {% extends 'admin/base.html' %}
+
 {% block content %}
-<h2>Dashboard</h2>
-<p>Welcome to the Pharmacy Management System.</p>
-</body>
-</html>
+<h2 class="mb-4">📊 Dashboard</h2>
+<p class="lead">Welcome to the Pharmacy Management System.</p>
+
+<div class="row">
+  <!-- Total Medicines -->
+  <div class="col-md-4 mb-3">
+    <div class="card text-white bg-primary shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Total Medicines</h5>
+        <h3>{{ total_medicines }}</h3>
+        <p class="card-text"><a href="{% url 'list_medicine' %}" class="text-white">View Details →</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Out of Stock -->
+  <div class="col-md-4 mb-3">
+    <div class="card text-white bg-danger shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Out of Stock</h5>
+        <h3>{{ out_of_stock }}</h3>
+        <p class="card-text"><a href="{% url 'stock_out_medicines' %}" class="text-white">View Details →</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Expired Medicines -->
+  <div class="col-md-4 mb-3">
+    <div class="card text-white bg-warning shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Expired Medicines</h5>
+        <h3>{{ expired_medicines }}</h3>
+        <p class="card-text"><a href="{% url 'expired_medicines' %}" class="text-white">View Details →</a></p>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

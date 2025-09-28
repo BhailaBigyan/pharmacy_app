@@ -13,11 +13,12 @@
   <!-- Print Button -->
   <div class="mb-3">
     <button onclick="printTable()" class="btn btn-success">🖨️ Print</button>
+    <a href="{% url 'add_medicine' %}" class="btn btn-primary">➕ Add Medicine</a>
   </div>
 
   <!-- Table -->
   <div id="medicine-table">
-    <table class="table table-bordered table-striped table-hover" style="font-size: small;">
+    <table class="table table-bordered table-striped table-hover align-middle" style="font-size: small;">
       <thead class="table-dark">
         <tr>
           <th>Name</th>
@@ -28,6 +29,7 @@
           <th>Mfg Date</th>
           <th>Exp Date</th>
           <th>Supplier</th>
+          <th class="text-center">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -38,26 +40,32 @@
           <td>{{ med.company }}</td>
           <td>{{ med.price }}</td>
           <td>
-            {% if med.stock <= 0 %} <span class="badge bg-danger">Out of Stock</span>
-              {% else %}
+            {% if med.stock <= 0 %}
+              <span class="badge bg-danger">Out of Stock</span>
+            {% else %}
               {{ med.stock }}
-              {% endif %}
+            {% endif %}
           </td>
           <td>{{ med.mfg_date }}</td>
           <td>
-            {% if med.exp_date < today %} <span class="badge bg-danger">Expired</span>
-              {% elif med.exp_date|date:"Y-m-d" <= today|add:"30 days" %} <span class="badge bg-warning text-dark">
-                Expiring Soon</span>
-                {% else %}
-                {{ med.exp_date }}
-                {% endif %}
+            {% if med.exp_date < today %}
+              <span class="badge bg-warning text-dark">Expired</span>
+            {% else %}
+              {{ med.exp_date }}
+            {% endif %}
           </td>
-
           <td>{{ med.supplier }}</td>
+          <td class="text-center" style="align-items: center; display: flex; gap: 1px; justify-content: center;">
+            <a href="{% url 'update_medicine' med.id %}" class="btn btn-sm btn-warning" style="font-size: small; width: 50px;">Edit</a>
+            <a href="{% url 'delete_medicine' med.id %}" class="btn btn-sm btn-danger" style="font-size: small; width: 50px;"
+               onclick="return confirm('Are you sure you want to delete {{ med.name }}?');">
+               Delete
+            </a>
+          </td>
         </tr>
         {% empty %}
         <tr>
-          <td colspan="8" class="text-center">No medicines available</td>
+          <td colspan="9" class="text-center">No medicines available</td>
         </tr>
         {% endfor %}
       </tbody>
