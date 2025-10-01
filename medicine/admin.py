@@ -1,10 +1,20 @@
 from django.contrib import admin
 from .models import Medicine
-# Register your models here.
 
 @admin.register(Medicine)
 class MedicineAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'price', 'stock')
-    search_fields = ('name', 'description')
-    list_filter = ('company', 'supplier', 'mfg_date', 'exp_date')
+    list_display = (
+        'medicine_id',
+        'name',
+        'brand_name',
+        'category',
+      # make sure this exists in your model
+        'price',
+        'stock_qty',
+        'mfg_date',
+        'exp_date',
+        'supplier',  # ForeignKey works fine
+    )
+    search_fields = ('name', 'brand_name', 'category',)
+    list_filter = ('supplier', 'category', 'mfg_date', 'exp_date')
     ordering = ('name',)

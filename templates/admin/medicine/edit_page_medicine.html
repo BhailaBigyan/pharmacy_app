@@ -36,14 +36,14 @@
         {% for med in filter.qs %}
         <tr>
           <td>{{ med.name }}</td>
-          <td>{{ med.description|truncatewords:10 }}</td>
+          <!-- <td>{{ med.description|truncatewords:10 }}</td> -->
           <td>{{ med.company }}</td>
           <td>{{ med.price }}</td>
           <td>
-            {% if med.stock <= 0 %}
+            {% if med.stock_qty <= 0 %}
               <span class="badge bg-danger">Out of Stock</span>
             {% else %}
-              {{ med.stock }}
+              {{ med.stock_qty }}
             {% endif %}
           </td>
           <td>{{ med.mfg_date }}</td>

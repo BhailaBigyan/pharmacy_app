@@ -3,7 +3,6 @@ from django.urls import include, path
 from . import views
 
 urlpatterns = [
-    path('search_medicine/', views.search, name='search'),
     path('add_medicine/', views.add_medicine, name='add_medicine'),
     path('list_medicine/', views.list_medicine, name='list_medicine'),
     path('edit_page_medicine/', views.edit_page_medicine, name='edit_page_medicine'),

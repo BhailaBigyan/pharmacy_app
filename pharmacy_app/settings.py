@@ -14,7 +14,7 @@ SECRET_KEY = 'django-insecure-linfk6dl#^npscg$gt^70^xi9nx8e4duj=hp+@q2!38ouw84)%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['https://pharmacy-app-h1te.onrender.com']
+ALLOWED_HOSTS = ['https://pharmacy-app-h1te.onrender.com','127.0.0.1']
 
 
 # Application definition
@@ -26,9 +26,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_filters',
     'pharmacy',
     'medicine',
-    'django_filters',
+    'supplier',
 ]
 
 MIDDLEWARE = [
@@ -118,3 +119,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/login/'       # where @login_required sends users
 LOGIN_REDIRECT_URL = '/dashboard/'   # default redirect after login
 LOGOUT_REDIRECT_URL = '/login/'
+
+
+AUTHENTICATION_BACKENDS = ['pharmacy.backends.CustomUserBackend']
+AUTH_USER_MODEL = 'pharmacy.User'
