@@ -1,50 +1,41 @@
 from datetime import date
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 
 from medicine.filters import MedicineFilter
 from medicine.forms import MedicineForm
 from .models import Medicine
 
-# Create your views here.
-
-def search(request):
-    return render(request, 'admin/search_medicine.html')
-
-
+# Add Medicine
 def add_medicine(request):
     if request.method == "POST":
         form = MedicineForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('list_medicine')  # redirect to medicine list after saving
+            return redirect('list_medicine')
     else:
         form = MedicineForm()
     return render(request, "admin/medicine/add_medicine.html", {"form": form})
 
-# def list_medicine(request):
-#     medicines = Medicine.objects.all()
-#     medicine_filter = MedicineFilter(request.GET, queryset=medicines)
-#     return render(request, 'admin/medicine/list_medicine.html', {"medicines": medicines, "filter": medicine_filter})
-
+# List Medicines
 def list_medicine(request):
     medicines = Medicine.objects.all()
     medicine_filter = MedicineFilter(request.GET, queryset=medicines)
     return render(request, 'admin/medicine/list_medicine.html', {
-        "medicines": medicines,
         "filter": medicine_filter,
-         "today": date.today(),
+        "today": date.today(),
     })
 
-
+# Delete Medicine
 def delete_medicine(request, pk):
-    medicine = Medicine.objects.get(id=pk)
+    medicine = get_object_or_404(Medicine, pk=pk)
     if request.method == "POST":
         medicine.delete()
         return redirect('list_medicine')
     return render(request, 'admin/medicine/delete_medicine.html', {'medicine': medicine})
 
+# Update Medicine
 def update_medicine(request, pk):
-    medicine = Medicine.objects.get(id=pk)
+    medicine = get_object_or_404(Medicine, pk=pk)
     if request.method == "POST":
         form = MedicineForm(request.POST, instance=medicine)
         if form.is_valid():
@@ -52,32 +43,29 @@ def update_medicine(request, pk):
             return redirect('list_medicine')
     else:
         form = MedicineForm(instance=medicine)
-    return render(request, 'admin/medicine/update_medicine.html', {'form': form})   
+    return render(request, 'admin/medicine/update_medicine.html', {'form': form})
 
+# Edit Page Medicine (if needed as a separate view)
 def edit_page_medicine(request): 
     medicines = Medicine.objects.all()
     medicine_filter = MedicineFilter(request.GET, queryset=medicines)
     return render(request, 'admin/medicine/edit_page_medicine.html', {
-        "medicines": medicines,
         "filter": medicine_filter,
-         "today": date.today(),
+        "today": date.today(),
     })
 
-
+# Expired Medicines
 def expired_medicines(request):
-    today = date.today()  # ensure it's a date, not datetime
+    today = date.today()
     expired_list = Medicine.objects.filter(exp_date__lt=today).order_by('exp_date')
     return render(request, 'admin/dashboard/expired_medicine.html', {
         'expired_list': expired_list,
         'today': today
     })
 
-
+# Stock Out Medicines
 def stock_out_medicines(request):
-    out_of_stock_list = Medicine.objects.filter(stock__lte=0).order_by('name')
-    context = {
+    out_of_stock_list = Medicine.objects.filter(stock_qty__lte=0).order_by('name')
+    return render(request, 'admin/dashboard/stockout_medicine.html', {
         'out_of_stock_list': out_of_stock_list
-    }
-    return render(request, 'admin/dashboard/stockout_medicine.html', context)
-
-
+    })

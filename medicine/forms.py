@@ -6,12 +6,12 @@ class MedicineForm(forms.ModelForm):
         model = Medicine
         fields = [
             'name',
-            'description',
-            'company',
-            'price',
-            'stock',
+            'brand_name',
+            'category',
             'mfg_date',
             'exp_date',
+            'price',
+            'stock_qty',
             'supplier',
         ]
         widgets = {

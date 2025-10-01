@@ -75,6 +75,19 @@
           </ul>
         </div>
       </li>
+       <li>
+        <a class="nav-link" data-bs-toggle="collapse" href="#supplierMenu" role="button" aria-expanded="false"
+          aria-controls="supplierMenu">
+          Supplier
+        </a>
+        <div class="collapse ps-3" id="supplierMenu">
+          <ul class="nav flex-column">
+            <li><a href="{% url 'add_supplier' %}" class="nav-link">Add Supplier</a></li>
+            <li><a href="{% url 'edit_supplier' %}" class="nav-link">Edit Supplier</a></li>
+            <li><a href="{% url 'list_supplier' %}" class="nav-link">Supplier List</a></li>
+          </ul>
+        </div>
+      </li>
     </ul>
     <hr>
     <div>
