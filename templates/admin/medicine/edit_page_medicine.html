@@ -10,20 +10,21 @@
     <a href="{% url 'list_medicine' %}" class="btn btn-secondary">Reset</a>
   </form>
 
-  <!-- Print Button -->
+  <!-- Print & Add Buttons -->
   <div class="mb-3">
     <button onclick="printTable()" class="btn btn-success">🖨️ Print</button>
     <a href="{% url 'add_medicine' %}" class="btn btn-primary">➕ Add Medicine</a>
   </div>
 
-  <!-- Table -->
+  <!-- Medicine Table -->
   <div id="medicine-table">
     <table class="table table-bordered table-striped table-hover align-middle" style="font-size: small;">
       <thead class="table-dark">
         <tr>
+          <th>ID</th>
           <th>Name</th>
-          <th>Description</th>
-          <th>Company</th>
+          <th>Brand Name</th>
+          <th>Category</th>
           <th>Price</th>
           <th>Stock</th>
           <th>Mfg Date</th>
@@ -35,9 +36,10 @@
       <tbody>
         {% for med in filter.qs %}
         <tr>
+          <td>{{ med.medicine_id }}</td>
           <td>{{ med.name }}</td>
-          <!-- <td>{{ med.description|truncatewords:10 }}</td> -->
-          <td>{{ med.company }}</td>
+          <td>{{ med.brand_name }}</td>
+          <td>{{ med.get_category_display }}</td>
           <td>{{ med.price }}</td>
           <td>
             {% if med.stock_qty <= 0 %}
@@ -55,9 +57,9 @@
             {% endif %}
           </td>
           <td>{{ med.supplier }}</td>
-          <td class="text-center" style="align-items: center; display: flex; gap: 1px; justify-content: center;">
-            <a href="{% url 'update_medicine' med.id %}" class="btn btn-sm btn-warning" style="font-size: small; width: 50px;">Edit</a>
-            <a href="{% url 'delete_medicine' med.id %}" class="btn btn-sm btn-danger" style="font-size: small; width: 50px;"
+          <td class="text-center" style="display: flex; gap: 4px; justify-content: center;">
+            <a href="{% url 'update_medicine' med.medicine_id %}" class="btn btn-sm btn-warning">Edit</a>
+            <a href="{% url 'delete_medicine' med.medicine_id %}" class="btn btn-sm btn-danger"
                onclick="return confirm('Are you sure you want to delete {{ med.name }}?');">
                Delete
             </a>

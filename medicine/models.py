@@ -2,7 +2,7 @@ from django.db import models
 from supplier.models import Supplier   # link with Supplier app
 
 class Medicine(models.Model):
-    medicine_id = models.AutoField(primary_key=True, default=1)   # custom PK
+    medicine_id = models.AutoField(primary_key=True)   # custom PK
     name = models.CharField(max_length=100)
     brand_name = models.CharField(max_length=100)
     

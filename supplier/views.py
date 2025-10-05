@@ -1,17 +1,62 @@
 from django.shortcuts import render
-
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from .models import Supplier
+from medicine.models import Medicine
 # Create your views here.
+from django.shortcuts import render, redirect
+from .forms import SupplierForm
+from .models import Supplier
+
 def add_supplier(request):
-    return render(request, 'supplier/add_supplier.html')
+    if request.method == "POST":
+        form = SupplierForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('list_supplier')  # redirect after saving
+    else:
+        form = SupplierForm()
+    
+    return render(request, 'admin/supplier/add_supplier.html', {'form': form})
+
+
 
 def supplier_report(request):
-    return render(request, 'supplier/supplier_report.html')
+    today = timezone.now().date()
+
+    # Get supplier filter from GET parameter (e.g., ?supplier=1)
+    supplier_id = request.GET.get('supplier')
+    if supplier_id:
+        medicines = Medicine.objects.filter(supplier_id=supplier_id).select_related('supplier')
+    else:
+        medicines = Medicine.objects.all().select_related('supplier')
+
+    suppliers = Supplier.objects.all()
+
+    context = {
+        'medicines': medicines,
+        'suppliers': suppliers,
+        'selected_supplier': int(supplier_id) if supplier_id else None,
+        'today': today
+    }
+    return render(request, 'admin/supplier/supplier_report.html', context)
 
 def list_supplier(request):
-    return render(request, 'supplier/list_supplier.html')
+    suppliers = Supplier.objects.all()
+    return render(request, 'admin/supplier/list_supplier.html', {'suppliers': suppliers})
 
-def edit_supplier(request, supplier_id):
-    return render(request, 'supplier/edit_supplier.html', {'supplier_id': supplier_id})
+def edit_supplier(request, supplier_id):  # must accept supplier_id
+    supplier = get_object_or_404(Supplier, id=supplier_id)
+    if request.method == 'POST':
+        form = SupplierForm(request.POST, instance=supplier)
+        if form.is_valid():
+            form.save()
+            return redirect('list_supplier')
+    else:
+        form = SupplierForm(instance=supplier)
+    return render(request, 'admin/supplier/edit_supplier.html', {'form': form, 'supplier': supplier})
 
 def delete_supplier(request, supplier_id):
-    return render(request, 'supplier/delete_supplier.html', {'supplier_id': supplier_id})
+    supplier = get_object_or_404(Supplier, id=supplier_id)
+    supplier.delete()
+    return redirect('list_supplier')
