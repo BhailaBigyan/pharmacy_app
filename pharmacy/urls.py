@@ -9,4 +9,5 @@ urlpatterns = [
     path("register/", views.register_view, name="register"),
     #For stock
     path('stock/stock_report/', views.stock_report, name='stock_report'),
+    path('pharmacist/dashboard/', views.pharmacist_dashboard, name='pharmacist_dashboard'),
   ]
