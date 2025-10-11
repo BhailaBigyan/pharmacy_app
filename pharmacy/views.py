@@ -6,6 +6,7 @@ from medicine.filters import MedicineFilter
 from medicine.models import Medicine
 # Create your views here.
 from django.contrib.auth.decorators import login_required
+from .decorators import admin_required, pharmacist_required, staff_required, pharmacist_or_staff_required
 
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
@@ -51,32 +52,128 @@ def login_view(request):
 
 
 from django.contrib.auth import logout
+from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
+from django.urls import reverse_lazy
+from django.contrib import messages
+from django.core.mail import send_mail
+from django.conf import settings
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+import random
+import string
 
 def logout_view(request):
     logout(request)
     return redirect('login')
 
+# Forgot Password Views
+def forgot_password(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        try:
+            user = User.objects.get(email=email)
+            # Generate reset token
+            reset_token = ''.join(random.choices(string.ascii_letters + string.digits, k=32))
+            user.reset_token = reset_token
+            user.save()
+            
+            # For testing purposes, we'll show the reset link instead of sending email
+            reset_url = request.build_absolute_uri(f'/reset-password/{reset_token}/')
+            
+            messages.success(request, f'Password reset link generated! For testing: {reset_url}')
+            return redirect('forgot_password')
+            
+        except User.DoesNotExist:
+            messages.error(request, 'No account found with this email address.')
+    
+    return render(request, 'forgot_password.html')
 
-@login_required
+def reset_password(request, token):
+    try:
+        user = User.objects.get(reset_token=token)
+        if request.method == 'POST':
+            password = request.POST.get('password')
+            confirm_password = request.POST.get('confirm_password')
+            
+            if password == confirm_password:
+                user.set_password(password)
+                user.reset_token = None
+                user.save()
+                messages.success(request, 'Password has been reset successfully. Please login.')
+                return redirect('login')
+            else:
+                messages.error(request, 'Passwords do not match.')
+    except User.DoesNotExist:
+        messages.error(request, 'Invalid reset token.')
+        return redirect('login')
+    
+    return render(request, 'reset_password.html', {'token': token})
+
+def test_forgot_password(request):
+    """Test view for forgot password functionality"""
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        try:
+            user = User.objects.get(email=email)
+            # Generate reset token
+            reset_token = ''.join(random.choices(string.ascii_letters + string.digits, k=32))
+            user.reset_token = reset_token
+            user.save()
+            
+            # For testing purposes, we'll show the reset link instead of sending email
+            reset_url = request.build_absolute_uri(f'/reset-password/{reset_token}/')
+            
+            messages.success(request, f'Password reset link generated! For testing: {reset_url}')
+            return redirect('test_forgot_password')
+            
+        except User.DoesNotExist:
+            messages.error(request, 'No account found with this email address.')
+    
+    return render(request, 'test_forgot_password.html')
+
+
+@admin_required
 def index(request):
-    total_medicines = Medicine.objects.count()
-    out_of_stock = Medicine.objects.filter(stock_qty__lte=0).count()
-    expired_medicines = Medicine.objects.filter(exp_date__lt=timezone.now().date()).count()
+    # Redirect based on user role
+    if request.user.role == 'admin':
+        total_medicines = Medicine.objects.count()
+        out_of_stock = Medicine.objects.filter(stock_qty__lte=0).count()
+        expired_medicines = Medicine.objects.filter(exp_date__lt=timezone.now().date()).count()
 
-    context = {
-        'total_medicines': total_medicines,
-        'out_of_stock': out_of_stock,
-        'expired_medicines': expired_medicines,
-    }
-    return render(request, 'admin/dashboard.html', context)
+        context = {
+            'total_medicines': total_medicines,
+            'out_of_stock': out_of_stock,
+            'expired_medicines': expired_medicines,
+        }
+        return render(request, 'admin/dashboard.html', context)
+    elif request.user.role == 'pharmacist':
+        return redirect('pharmacist_dashboard')
+    else:
+        return redirect('staff_dashboard')
 
 #for stock report
 
 def stock_report(request):
+    from datetime import timedelta
+    
     medicines = Medicine.objects.all()
+    today = date.today()
+    expiring_soon_date = today + timedelta(days=30)
+    
+    # Calculate statistics
+    total_medicines = medicines.count()
+    in_stock = medicines.filter(stock_qty__gt=10).count()
+    low_stock = medicines.filter(stock_qty__lte=10, stock_qty__gt=0).count()
+    out_of_stock = medicines.filter(stock_qty__lte=0).count()
+    
     return render(request, 'admin/stock/stock_report.html', {
         "medicines": medicines,
-         "today": date.today(),
+        "today": today,
+        "expiring_soon_date": expiring_soon_date,
+        "total_medicines": total_medicines,
+        "in_stock": in_stock,
+        "low_stock": low_stock,
+        "out_of_stock": out_of_stock,
     })
 
 
@@ -112,8 +209,82 @@ def register_view(request):
 
 
 # For pharmacist dashboard
-@login_required
+@pharmacist_or_staff_required
 def pharmacist_dashboard(request):
+    from billing.models import Invoice, InvoiceItem
+    from django.db.models import Sum, Count
+    from datetime import datetime, timedelta
+    
+    # Basic medicine stats
+    total_medicines = Medicine.objects.count()
+    out_of_stock = Medicine.objects.filter(stock_qty__lte=0).count()
+    expired_medicines = Medicine.objects.filter(exp_date__lt=timezone.now().date()).count()
+    
+    # Sales analytics
+    today = timezone.now().date()
+    this_month = today.replace(day=1)
+    last_month = (this_month - timedelta(days=1)).replace(day=1)
+    
+    # Today's sales
+    today_sales = Invoice.objects.filter(created_at__date=today).aggregate(
+        total=Sum('total'), count=Count('invoice_id')
+    )
+    
+    # This month's sales
+    month_sales = Invoice.objects.filter(created_at__date__gte=this_month).aggregate(
+        total=Sum('total'), count=Count('invoice_id')
+    )
+    
+    # Last month's sales
+    last_month_sales = Invoice.objects.filter(
+        created_at__date__gte=last_month,
+        created_at__date__lt=this_month
+    ).aggregate(total=Sum('total'), count=Count('invoice_id'))
+    
+    # Top selling medicines
+    top_medicines = InvoiceItem.objects.values('medicine__name').annotate(
+        total_sold=Sum('quantity'),
+        total_revenue=Sum('total')
+    ).order_by('-total_sold')[:5]
+    
+    # Recent transactions
+    recent_transactions = Invoice.objects.all().order_by('-created_at')[:5]
+    
+    # Sales trend (last 7 days)
+    sales_trend = []
+    for i in range(7):
+        date = today - timedelta(days=i)
+        daily_sales = Invoice.objects.filter(created_at__date=date).aggregate(
+            total=Sum('total')
+        )['total'] or 0
+        sales_trend.append({
+            'date': date.strftime('%m/%d'),
+            'amount': float(daily_sales)
+        })
+    sales_trend.reverse()
+    
+    # Convert to JSON string for JavaScript
+    import json
+    sales_trend_json = json.dumps(sales_trend)
+
+    context = {
+        'total_medicines': total_medicines,
+        'out_of_stock': out_of_stock,
+        'expired_medicines': expired_medicines,
+        'today_sales': today_sales['total'] or 0,
+        'today_transactions': today_sales['count'] or 0,
+        'month_sales': month_sales['total'] or 0,
+        'month_transactions': month_sales['count'] or 0,
+        'last_month_sales': last_month_sales['total'] or 0,
+        'top_medicines': top_medicines,
+        'recent_transactions': recent_transactions,
+        'sales_trend': sales_trend_json,
+    }
+    return render(request, 'pharmacist/dashboard.html', context)
+
+# For staff dashboard
+@staff_required
+def staff_dashboard(request):
     total_medicines = Medicine.objects.count()
     out_of_stock = Medicine.objects.filter(stock_qty__lte=0).count()
     expired_medicines = Medicine.objects.filter(exp_date__lt=timezone.now().date()).count()
@@ -123,4 +294,4 @@ def pharmacist_dashboard(request):
         'out_of_stock': out_of_stock,
         'expired_medicines': expired_medicines,
     }
-    return render(request, 'pharmacist/dashboard.html', context)
+    return render(request, 'pharmacist/dashboard.html', context)  # Use same template as pharmacist

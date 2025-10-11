@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% block title %}Invoice #{{ invoice.invoice_id }} - Pharmacy Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-3">
+                <i class="bi bi-receipt"></i> Invoice #{{ invoice.invoice_id }}
+            </h1>
+            <p class="text-muted">Generated on {{ invoice.created_at|date:"F d, Y \a\t H:i" }}</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle"></i> Invoice Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Customer Information:</h6>
+                            <p><strong>Name:</strong> {{ invoice.customer_name }}</p>
+                            {% if invoice.phone_number %}
+                            <p><strong>Phone:</strong> {{ invoice.phone_number }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Payment Details:</h6>
+                            <p><strong>Method:</strong> {{ invoice.get_payment_method_display }}</p>
+                            {% if invoice.payment_method == "cash" and invoice.amount_received %}
+                            <p><strong>Amount Received:</strong> NRS {{ invoice.amount_received|floatformat:2 }}</p>
+                            <p><strong>Change:</strong> NRS {{ invoice.return_amount|floatformat:2 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-list"></i> Items
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Medicine</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in invoice.items.all %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ item.medicine.name }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>NRS {{ item.price|floatformat:2 }}</td>
+                                <td>NRS {{ item.total|floatformat:2 }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">No items found for this invoice.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-calculator"></i> Summary
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <span><strong>Subtotal:</strong></span>
+                        <span><strong>NRS {{ invoice.subtotal|floatformat:2 }}</strong></span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span><strong>Tax (13%):</strong></span>
+                        <span><strong>NRS {{ invoice.tax|floatformat:2 }}</strong></span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <span><strong>TOTAL:</strong></span>
+                        <span><strong>NRS {{ invoice.total|floatformat:2 }}</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-gear"></i> Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button onclick="window.print()" class="btn btn-primary">
+                            <i class="bi bi-printer"></i> Print Invoice
+                        </button>
+                        <a href="{% url 'bill' %}" class="btn btn-success">
+                            <i class="bi bi-plus"></i> New Bill
+                        </a>
+                        <a href="{% url 'sales_report' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-graph-up"></i> Sales Report
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Print-only styles -->
+<style media="print">
+    .card-header, .btn, .nav, .header, .footer {
+        display: none !important;
+    }
+    
+    .card {
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+    }
+    
+    body {
+        background: white !important;
+    }
+    
+    .container-fluid {
+        max-width: none !important;
+        padding: 0 !important;
+    }
+    
+    .row {
+        margin: 0 !important;
+    }
+    
+    .col-lg-8, .col-lg-4 {
+        width: 100% !important;
+        max-width: none !important;
+    }
+    
+    .card {
+        margin-bottom: 20px !important;
+    }
+    
+    h1, h5, h6 {
+        color: black !important;
+    }
+    
+    .text-muted {
+        color: #666 !important;
+    }
+    
+    .text-primary {
+        color: black !important;
+    }
+    
+    .text-success {
+        color: black !important;
+    }
+    
+    .table {
+        border-collapse: collapse !important;
+    }
+    
+    .table th, .table td {
+        border: 1px solid #000 !important;
+        padding: 8px !important;
+    }
+    
+    .table thead th {
+        background-color: #f8f9fa !important;
+        font-weight: bold !important;
+    }
+    
+    hr {
+        border-top: 1px solid #000 !important;
+    }
+    
+    /* Print-only message */
+    .print-only {
+        display: block !important;
+        text-align: center;
+        margin-top: 30px;
+        font-size: 18px;
+        font-weight: bold;
+    }
+</style>
+
+<!-- Print-only thank you message -->
+<div class="print-only" style="display: none;">
+    <p>Thank you for your business!</p>
+    <p>Visit us again soon!</p>
+</div>
+
+<script>
+    // Show print-only message when printing
+    window.addEventListener('beforeprint', function() {
+        document.querySelector('.print-only').style.display = 'block';
+    });
+    
+    window.addEventListener('afterprint', function() {
+        document.querySelector('.print-only').style.display = 'none';
+    });
+</script>
+{% endblock %}

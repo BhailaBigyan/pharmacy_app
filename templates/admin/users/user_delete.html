@@ -1,0 +1,107 @@
+{% extends 'admin/base.html' %}
+{% block title %}Delete User - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-3">
+                <i class="bi bi-exclamation-triangle text-danger"></i> Delete User
+            </h1>
+            <p class="text-muted">Are you sure you want to delete this user?</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-person"></i> User Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <strong>Username:</strong>
+                                <p>{{ user_obj.username }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Email:</strong>
+                                <p>{{ user_obj.email }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Name:</strong>
+                                <p>{{ user_obj.first_name }} {{ user_obj.last_name }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <strong>Role:</strong>
+                                <p>
+                                    <span class="badge {% if user_obj.role == 'admin' %}bg-danger{% elif user_obj.role == 'pharmacist' %}bg-primary{% else %}bg-info{% endif %}">
+                                        {{ user_obj.get_role_display }}
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Status:</strong>
+                                <p>
+                                    {% if user_obj.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Date Joined:</strong>
+                                <p>{{ user_obj.date_joined|date:"F d, Y" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-exclamation-triangle text-danger"></i> Warning
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>This action cannot be undone!</strong><br>
+                        Deleting this user will permanently remove their account from the system.
+                    </div>
+
+                    {% if user_obj.is_active %}
+                    <div class="alert alert-warning">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Active User:</strong><br>
+                        This user is currently active. Consider deactivating instead of deleting.
+                    </div>
+                    {% endif %}
+
+                    <form method="post" class="d-grid gap-2">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Yes, Delete User
+                        </button>
+                        <a href="{% url 'user_detail' user_obj.id %}" class="btn btn-outline-primary">
+                            <i class="bi bi-eye"></i> View Details
+                        </a>
+                        <a href="{% url 'user_list' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to List
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

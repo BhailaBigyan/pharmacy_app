@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block title %}Delete Medicine - Pharmacy Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-3">
+                <i class="bi bi-exclamation-triangle text-danger"></i> Delete Medicine
+            </h1>
+            <p class="text-muted">Are you sure you want to delete this medicine?</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-capsule"></i> Medicine Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <strong>Medicine Name:</strong>
+                                <p>{{ medicine.name }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Brand Name:</strong>
+                                <p>{{ medicine.brand_name|default:"Not specified" }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Category:</strong>
+                                <p>{{ medicine.category }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Company:</strong>
+                                <p>{{ medicine.company }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <strong>Price:</strong>
+                                <p class="text-primary">NRS {{ medicine.price|floatformat:2 }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Stock Quantity:</strong>
+                                <p>
+                                    <span class="badge {% if medicine.stock_qty <= 0 %}bg-danger{% elif medicine.stock_qty <= 10 %}bg-warning{% else %}bg-success{% endif %}">
+                                        {{ medicine.stock_qty }} units
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Manufacturing Date:</strong>
+                                <p>{{ medicine.mfg_date|date:"F d, Y" }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Expiry Date:</strong>
+                                <p>{{ medicine.exp_date|date:"F d, Y" }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if medicine.description %}
+                    <div class="mb-3">
+                        <strong>Description:</strong>
+                        <p>{{ medicine.description }}</p>
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <strong>Supplier:</strong>
+                        <p>{{ medicine.supplier.name|default:"No supplier assigned" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-exclamation-triangle text-danger"></i> Warning
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>This action cannot be undone!</strong><br>
+                        Deleting this medicine will permanently remove it from the system.
+                    </div>
+
+                    {% if medicine.stock_qty > 0 %}
+                    <div class="alert alert-warning">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Stock Available:</strong><br>
+                        This medicine has {{ medicine.stock_qty }} units in stock. Consider updating the stock instead of deleting.
+                    </div>
+                    {% endif %}
+
+                    <form method="post" class="d-grid gap-2">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Yes, Delete Medicine
+                        </button>
+                        <a href="{% url 'pharmacist_medicine_detail' medicine.medicine_id %}" class="btn btn-outline-primary">
+                            <i class="bi bi-eye"></i> View Details
+                        </a>
+                        <a href="{% url 'pharmacist_medicine_list' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to List
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

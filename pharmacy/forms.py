@@ -1,26 +1,85 @@
 from django import forms
-from .models import User
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import UserCreationForm
 
-class UserRegistrationForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput)
-    confirm_password = forms.CharField(widget=forms.PasswordInput)
+User = get_user_model()
 
+class UserForm(UserCreationForm):
+    """Form for creating new users"""
+    email = forms.EmailField(required=True)
+    first_name = forms.CharField(max_length=30, required=True)
+    last_name = forms.CharField(max_length=30, required=True)
+    role = forms.ChoiceField(
+        choices=[
+            ('admin', 'Admin'),
+            ('pharmacist', 'Pharmacist'),
+            ('staff', 'Staff'),
+        ],
+        required=True
+    )
+    
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name', 'last_name', 'role', 'password']
+        fields = ('username', 'email', 'first_name', 'last_name', 'role', 'password1', 'password2')
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({'class': 'form-control'})
+        self.fields['email'].widget.attrs.update({'class': 'form-control'})
+        self.fields['first_name'].widget.attrs.update({'class': 'form-control'})
+        self.fields['last_name'].widget.attrs.update({'class': 'form-control'})
+        self.fields['role'].widget.attrs.update({'class': 'form-select'})
+        self.fields['password1'].widget.attrs.update({'class': 'form-control'})
+        self.fields['password2'].widget.attrs.update({'class': 'form-control'})
 
-    def clean(self):
-        cleaned_data = super().clean()
-        password = cleaned_data.get("password")
-        confirm_password = cleaned_data.get("confirm_password")
-        if password != confirm_password:
-            raise forms.ValidationError("Passwords do not match")
-        return cleaned_data
+class UserEditForm(forms.ModelForm):
+    """Form for editing existing users"""
+    role = forms.ChoiceField(
+        choices=[
+            ('admin', 'Admin'),
+            ('pharmacist', 'Pharmacist'),
+            ('staff', 'Staff'),
+        ],
+        required=True
+    )
+    
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'first_name', 'last_name', 'role', 'is_active')
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({'class': 'form-control'})
+        self.fields['email'].widget.attrs.update({'class': 'form-control'})
+        self.fields['first_name'].widget.attrs.update({'class': 'form-control'})
+        self.fields['last_name'].widget.attrs.update({'class': 'form-control'})
+        self.fields['role'].widget.attrs.update({'class': 'form-select'})
+        self.fields['is_active'].widget.attrs.update({'class': 'form-check-input'})
 
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        user.password = make_password(self.cleaned_data["password"])  # hash password
-        if commit:
-            user.save()
-        return user
+class UserRegistrationForm(UserCreationForm):
+    """Form for user registration"""
+    email = forms.EmailField(required=True)
+    first_name = forms.CharField(max_length=30, required=True)
+    last_name = forms.CharField(max_length=30, required=True)
+    role = forms.ChoiceField(
+        choices=[
+            ('pharmacist', 'Pharmacist'),
+            ('staff', 'Staff'),
+        ],
+        required=True,
+        initial='staff'
+    )
+    
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'first_name', 'last_name', 'role', 'password1', 'password2')
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({'class': 'form-control'})
+        self.fields['email'].widget.attrs.update({'class': 'form-control'})
+        self.fields['first_name'].widget.attrs.update({'class': 'form-control'})
+        self.fields['last_name'].widget.attrs.update({'class': 'form-control'})
+        self.fields['role'].widget.attrs.update({'class': 'form-select'})
+        self.fields['password1'].widget.attrs.update({'class': 'form-control'})
+        self.fields['password2'].widget.attrs.update({'class': 'form-control'})

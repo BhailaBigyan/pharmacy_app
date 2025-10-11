@@ -1,41 +1,239 @@
-{% extends 'Pharmacist/base.html' %}
+{% extends 'base.html' %}
+{% block title %}Dashboard - Pharmacist Pannel{% endblock %}
 
 {% block content %}
-<h2 class="mb-4">📊 Dashboard</h2>
-<p class="lead">Welcome to the Pharmacist View</p>
-
-<div class="row">
-  <!-- Total Medicines -->
-  <div class="col-md-4 mb-3">
-    <div class="card text-white bg-primary shadow-sm">
-      <div class="card-body">
-        <h5 class="card-title">Total Medicines</h5>
-        <h3>{{ total_medicines }}</h3>
-        <p class="card-text"><a href="{% url 'list_medicine' %}" class="text-white">View Details →</a></p>
-      </div>
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-3">
+                <i class="bi bi-speedometer2"></i> Pharmacy Dashboard
+            </h1>
+            <p class="text-muted">Welcome back, {{ request.user.get_full_name|default:request.user.username }}!</p>
+        </div>
     </div>
-  </div>
 
-  <!-- Out of Stock -->
-  <div class="col-md-4 mb-3">
-    <div class="card text-white bg-danger shadow-sm">
-      <div class="card-body">
-        <h5 class="card-title">Out of Stock</h5>
-        <h3>{{ out_of_stock }}</h3>
-        <p class="card-text"><a href="{% url 'stock_out_medicines' %}" class="text-white">View Details →</a></p>
-      </div>
+    <!-- Key Metrics Row -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card">
+                <div class="stat-number">{{ total_medicines }}</div>
+                <div class="stat-label">Total Medicines</div>
+                <a href="{% url 'list_medicine' %}" class="btn btn-outline-primary btn-sm mt-2">View Details</a>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card">
+                <div class="stat-number text-success">NRS {{ today_sales|floatformat:2 }}</div>
+                <div class="stat-label">Today's Sales</div>
+                <small class="text-muted">{{ today_transactions }} transactions</small>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card">
+                <div class="stat-number text-primary">NRS {{ month_sales|floatformat:2 }}</div>
+                <div class="stat-label">This Month</div>
+                <small class="text-muted">{{ month_transactions }} transactions</small>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card">
+                <div class="stat-number text-warning">{{ out_of_stock }}</div>
+                <div class="stat-label">Out of Stock</div>
+                <a href="{% url 'stock_out_medicines' %}" class="btn btn-outline-warning btn-sm mt-2">View Details</a>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- Expired Medicines -->
-  <div class="col-md-4 mb-3">
-    <div class="card text-white bg-warning shadow-sm">
-      <div class="card-body">
-        <h5 class="card-title">Expired Medicines</h5>
-        <h3>{{ expired_medicines }}</h3>
-        <p class="card-text"><a href="{% url 'expired_medicines' %}" class="text-white">View Details →</a></p>
-      </div>
+    <!-- Charts and Analytics Row -->
+    <div class="row mb-4">
+        <!-- Sales Trend Chart -->
+        <div class="col-lg-8 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-graph-up"></i> Sales Trend (Last 7 Days)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div style="height: 300px; position: relative;">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Top Selling Medicines -->
+        <div class="col-lg-4 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-trophy"></i> Top Selling Medicines
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for medicine in top_medicines %}
+                    <div class="d-flex justify-content-between align-items-center mb-3 p-2" style="background-color: var(--light-gray); border-radius: 6px;">
+                        <div>
+                            <h6 class="mb-1">{{ medicine.medicine__name }}</h6>
+                            <small class="text-muted">{{ medicine.total_sold }} units sold</small>
+                        </div>
+                        <div class="text-end">
+                            <strong class="text-success">NRS {{ medicine.total_revenue|floatformat:2 }}</strong>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted text-center">No sales data available</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
+
+    <!-- Additional Stats Row -->
+    <div class="row mb-4">
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="stat-card">
+                <div class="stat-number text-danger">{{ expired_medicines }}</div>
+                <div class="stat-label">Expired Medicines</div>
+                <a href="{% url 'expired_medicines' %}" class="btn btn-outline-danger btn-sm mt-2">View Details</a>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="stat-card">
+                <div class="stat-number text-info">NRS {{ last_month_sales|floatformat:2 }}</div>
+                <div class="stat-label">Last Month</div>
+                <small class="text-muted">Previous period</small>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="stat-card">
+                <div class="stat-number text-secondary">{{ month_transactions }}</div>
+                <div class="stat-label">Total Transactions</div>
+                <small class="text-muted">This month</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clock-history"></i> Recent Transactions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for transaction in recent_transactions %}
+                    <div class="d-flex justify-content-between align-items-center mb-3 p-3" style="background-color: var(--light-gray); border-radius: 6px;">
+                        <div>
+                            <strong>Invoice #{{ transaction.invoice_id }}</strong>
+                            <br>
+                            <small class="text-muted">{{ transaction.customer_name }}</small>
+                        </div>
+                        <div class="text-center">
+                            <span class="badge bg-primary">{{ transaction.payment_method|title }}</span>
+                        </div>
+                        <div class="text-end">
+                            <strong class="text-success">NRS {{ transaction.total|floatformat:2 }}</strong>
+                            <br>
+                            <small class="text-muted">{{ transaction.created_at|date:"M d, H:i" }}</small>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted text-center">No recent transactions</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Hidden data for JavaScript -->
+<script type="application/json" id="sales-data">{{ sales_trend|safe }}</script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js" defer></script>
+<script>
+    // Wait for DOM to be ready and Chart.js to load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Sales Trend Chart with optimized performance
+        const salesData = JSON.parse(document.getElementById('sales-data').textContent);
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        
+        // Optimized chart configuration
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: salesData.map(item => item.date),
+                datasets: [{
+                    label: 'Daily Sales (NRS)',
+                    data: salesData.map(item => item.amount),
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3,
+                    pointBackgroundColor: '#2563eb',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: '#2563eb',
+                        borderWidth: 1,
+                        cornerRadius: 8
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return 'NRS ' + value.toLocaleString();
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            maxTicksLimit: 7
+                        }
+                    }
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}

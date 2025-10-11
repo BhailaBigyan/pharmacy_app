@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% block title %}{{ medicine.name }} - Medicine Details{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-3">
+                <i class="bi bi-capsule"></i> {{ medicine.name }}
+            </h1>
+            <p class="text-muted">Medicine ID: {{ medicine.medicine_id }}</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle"></i> Medicine Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <strong>Medicine Name:</strong>
+                                <p>{{ medicine.name }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Brand Name:</strong>
+                                <p>{{ medicine.brand_name|default:"Not specified" }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Category:</strong>
+                                <p>{{ medicine.category }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Company:</strong>
+                                <p>{{ medicine.company }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <strong>Price:</strong>
+                                <p class="text-primary fs-5">NRS {{ medicine.price|floatformat:2 }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Stock Quantity:</strong>
+                                <p>
+                                    <span class="badge {% if medicine.stock_qty <= 0 %}bg-danger{% elif medicine.stock_qty <= 10 %}bg-warning{% else %}bg-success{% endif %} fs-6">
+                                        {{ medicine.stock_qty }} units
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Manufacturing Date:</strong>
+                                <p>{{ medicine.mfg_date|date:"F d, Y" }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Expiry Date:</strong>
+                                <p class="{% if medicine.exp_date < today %}text-danger{% endif %}">
+                                    {{ medicine.exp_date|date:"F d, Y" }}
+                                    {% if medicine.exp_date < today %}
+                                        <span class="badge bg-danger ms-2">Expired</span>
+                                    {% elif medicine.exp_date <= expiring_soon_date %}
+                                        <span class="badge bg-warning ms-2">Expiring Soon</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if medicine.description %}
+                    <div class="mb-3">
+                        <strong>Description:</strong>
+                        <p>{{ medicine.description }}</p>
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <strong>Supplier:</strong>
+                        <p>
+                            {% if medicine.supplier %}
+                                <a href="{% url 'supplier_detail' medicine.supplier.id %}" class="text-decoration-none">
+                                    {{ medicine.supplier.name }}
+                                </a>
+                            {% else %}
+                                <span class="text-muted">No supplier assigned</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-gear"></i> Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        
+                        <a href="{% url 'pharmacist_medicine_list' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-arrow-left"></i> Back to List
+                        </a>
+                      
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-graph-up"></i> Stock Status
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if medicine.stock_qty <= 0 %}
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <strong>Out of Stock!</strong><br>
+                            This medicine is currently out of stock.
+                        </div>
+                    {% elif medicine.stock_qty <= 10 %}
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <strong>Low Stock!</strong><br>
+                            Only {{ medicine.stock_qty }} units remaining.
+                        </div>
+                    {% else %}
+                        <div class="alert alert-success">
+                            <i class="bi bi-check-circle"></i>
+                            <strong>In Stock</strong><br>
+                            {{ medicine.stock_qty }} units available.
+                        </div>
+                    {% endif %}
+
+                    {% if medicine.exp_date < today %}
+                        <div class="alert alert-danger">
+                            <i class="bi bi-calendar-x"></i>
+                            <strong>Expired!</strong><br>
+                            This medicine has expired on {{ medicine.exp_date|date:"F d, Y" }}.
+                        </div>
+                    {% elif medicine.exp_date <= expiring_soon_date %}
+                        <div class="alert alert-warning">
+                            <i class="bi bi-calendar-exclamation"></i>
+                            <strong>Expiring Soon!</strong><br>
+                            This medicine will expire on {{ medicine.exp_date|date:"F d, Y" }}.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

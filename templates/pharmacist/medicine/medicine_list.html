@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+{% block title %}Medicine List - Pharmacy Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-3">
+                <i class="bi bi-capsule"></i> Medicine Inventory
+            </h1>
+            <p class="text-muted">Manage and view all medicines in the pharmacy</p>
+        </div>
+    </div>
+
+    <!-- Filter Form -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-funnel"></i> Filter Medicines
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="id_name" class="form-label">Name</label>
+                            {{ filter.form.name }}
+                        </div>
+                        <div class="col-md-3">
+                            <label for="id_brand_name" class="form-label">Brand</label>
+                            {{ filter.form.brand_name }}
+                        </div>
+                        <div class="col-md-3">
+                            <label for="id_category" class="form-label">Category</label>
+                            {{ filter.form.category }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-grid gap-2 d-md-flex">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-search"></i> Filter
+                                </button>
+                                <a href="{% url 'pharmacist_medicine_list' %}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-clockwise"></i> Reset
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    
+                    <a href="{% url 'pharmacist_medicine_stock_report' %}" class="btn btn-outline-primary">
+                        <i class="bi bi-graph-up"></i> Stock Report
+                    </a>
+                    <a href="{% url 'pharmacist_medicine_low_stock' %}" class="btn btn-outline-warning">
+                        <i class="bi bi-exclamation-triangle"></i> Low Stock
+                    </a>
+                    <a href="{% url 'pharmacist_medicine_expired' %}" class="btn btn-outline-danger">
+                        <i class="bi bi-calendar-x"></i> Expired
+                    </a>
+                </div>
+                <div>
+                    <span class="text-muted">Total: {{ page_obj.paginator.count }} medicines</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Medicine Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-table"></i> Medicine List
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table" id="medicineTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Brand</th>
+                                    <th>Category</th>
+                                    <th>Price</th>
+                                    <th>Stock</th>
+                                    <th>Expiry Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for medicine in page_obj %}
+                                <tr>
+                                    <td>{{ medicine.medicine_id }}</td>
+                                    <td>
+                                        <strong>{{ medicine.name }}</strong>
+                                        {% if medicine.brand_name %}
+                                            <br><small class="text-muted">{{ medicine.brand_name }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ medicine.brand_name|default:"N/A" }}</td>
+                                    <td>{{ medicine.category }}</td>
+                                    <td>NRS {{ medicine.price|floatformat:2 }}</td>
+                                    <td>
+                                        <span class="badge {% if medicine.stock_qty <= 0 %}bg-danger{% elif medicine.stock_qty <= 10 %}bg-warning{% else %}bg-success{% endif %}">
+                                            {{ medicine.stock_qty }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="{% if medicine.exp_date < today %}text-danger{% endif %}">
+                                            {{ medicine.exp_date|date:"Y-m-d" }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if medicine.stock_qty <= 0 %}
+                                            <span class="badge bg-danger">Out of Stock</span>
+                                        {% elif medicine.stock_qty <= 10 %}
+                                            <span class="badge bg-warning">Low Stock</span>
+                                        {% else %}
+                                            <span class="badge bg-success">In Stock</span>
+                                        {% endif %}
+                                        {% if medicine.exp_date < today %}
+                                            <span class="badge bg-danger ms-1">Expired</span>
+                                        {% elif medicine.exp_date <= expiring_soon_date %}
+                                            <span class="badge bg-warning ms-1">Expiring Soon</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'pharmacist_medicine_detail' medicine.medicine_id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                        
+                                            <a href="{% url 'pharmacist_medicine_delete' medicine.medicine_id %}" class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="9" class="text-center text-muted">No medicines found</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
+
+<!-- DataTables JavaScript -->
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    // Initialize DataTable
+    var table = $('#medicineTable').DataTable({
+        "pageLength": 25,
+        "order": [[0, "asc"]],
+        "columnDefs": [
+            { "orderable": false, "targets": 8 } // Disable sorting on Actions column
+        ],
+        "dom": 'Bfrtip',
+        "buttons": [
+            {
+                extend: 'excel',
+                text: '<i class="bi bi-file-excel"></i> Excel',
+                className: 'btn btn-success btn-sm'
+            },
+            {
+                extend: 'pdf',
+                text: '<i class="bi bi-file-pdf"></i> PDF',
+                className: 'btn btn-danger btn-sm'
+            },
+            {
+                extend: 'print',
+                text: '<i class="bi bi-printer"></i> Print',
+                className: 'btn btn-primary btn-sm'
+            }
+        ],
+        "language": {
+            "search": "Search medicines:",
+            "lengthMenu": "Show _MENU_ medicines per page",
+            "info": "Showing _START_ to _END_ of _TOTAL_ medicines",
+            "infoEmpty": "No medicines available",
+            "infoFiltered": "(filtered from _MAX_ total medicines)"
+        }
+    });
+
+    // Filter functionality
+    $('#id_name').on('keyup', function() {
+        table.column(1).search(this.value).draw();
+    });
+
+    $('#id_brand_name').on('keyup', function() {
+        table.column(2).search(this.value).draw();
+    });
+
+    $('#id_category').on('change', function() {
+        table.column(3).search(this.value).draw();
+    });
+
+    // Clear filters
+    $('.btn-outline-secondary').on('click', function(e) {
+        if (this.href.includes('pharmacist_medicine_list')) {
+            e.preventDefault();
+            $('#id_name, #id_brand_name, #id_category').val('');
+            table.search('').columns().search('').draw();
+        }
+    });
+});
+</script>
+{% endblock %}

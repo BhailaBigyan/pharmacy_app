@@ -1,5 +1,6 @@
 from datetime import date
 from django.shortcuts import redirect, render, get_object_or_404
+from django.contrib import messages
 
 from medicine.filters import MedicineFilter
 from medicine.forms import MedicineForm
@@ -25,6 +26,20 @@ def list_medicine(request):
         "today": date.today(),
     })
 
+# Medicine Detail
+def medicine_detail(request, medicine_id):
+    from datetime import timedelta
+    
+    medicine = get_object_or_404(Medicine, medicine_id=medicine_id)
+    today = date.today()
+    expiring_soon_date = today + timedelta(days=30)
+    
+    return render(request, 'admin/medicine/medicine_detail.html', {
+        'medicine': medicine,
+        'today': today,
+        'expiring_soon_date': expiring_soon_date,
+    })
+
 # Delete Medicine
 def delete_medicine(request, pk):
     medicine = get_object_or_404(Medicine, pk=pk)
@@ -46,12 +61,22 @@ def update_medicine(request, pk):
     return render(request, 'admin/medicine/update_medicine.html', {'form': form})
 
 # Edit Page Medicine (if needed as a separate view)
-def edit_page_medicine(request): 
-    medicines = Medicine.objects.all()
-    medicine_filter = MedicineFilter(request.GET, queryset=medicines)
+def edit_page_medicine(request, medicine_id):
+    medicine = get_object_or_404(Medicine, medicine_id=medicine_id)
+    
+    if request.method == "POST":
+        form = MedicineForm(request.POST, instance=medicine)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Medicine updated successfully!')
+            return redirect('medicine_detail', medicine_id=medicine.medicine_id)
+    else:
+        form = MedicineForm(instance=medicine)
+    
     return render(request, 'admin/medicine/edit_page_medicine.html', {
-        "filter": medicine_filter,
-        "today": date.today(),
+        'form': form,
+        'medicine': medicine,
+        'today': date.today(),
     })
 
 # Expired Medicines

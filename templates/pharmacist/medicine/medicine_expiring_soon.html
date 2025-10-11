@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+{% block title %}Expiring Soon Medicines - Pharmacy Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-3">
+                <i class="bi bi-calendar-exclamation text-warning"></i> Expiring Soon Medicines
+            </h1>
+            <p class="text-muted">Medicines expiring within the next 30 days</p>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-calendar-exclamation text-warning fs-1"></i>
+                    <h5 class="card-title">{{ medicines.count }}</h5>
+                    <p class="card-text">Expiring Soon</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-clock text-info fs-1"></i>
+                    <h5 class="card-title">30 Days</h5>
+                    <p class="card-text">Warning Period</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-calendar text-info fs-1"></i>
+                    <h5 class="card-title">{{ expiring_soon_date|date:"M d" }}</h5>
+                    <p class="card-text">Warning Date</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <a href="{% url 'pharmacist_medicine_list' %}" class="btn btn-primary">
+                        <i class="bi bi-list"></i> All Medicines
+                    </a>
+                    <a href="{% url 'pharmacist_medicine_stock_report' %}" class="btn btn-outline-primary">
+                        <i class="bi bi-graph-up"></i> Stock Report
+                    </a>
+                    <a href="{% url 'pharmacist_medicine_low_stock' %}" class="btn btn-outline-warning">
+                        <i class="bi bi-exclamation-triangle"></i> Low Stock
+                    </a>
+                    <a href="{% url 'pharmacist_medicine_expired' %}" class="btn btn-outline-danger">
+                        <i class="bi bi-calendar-x"></i> Expired
+                    </a>
+                </div>
+                <div>
+                    <span class="text-muted">Showing medicines expiring by {{ expiring_soon_date|date:"Y-m-d" }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Expiring Soon Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-table"></i> Expiring Soon Medicines
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if medicines %}
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Notice:</strong> These medicines will expire within the next 30 days. Consider prioritizing their sale or contacting suppliers for returns.
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table" id="expiringSoonTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Brand</th>
+                                    <th>Category</th>
+                                    <th>Price</th>
+                                    <th>Stock</th>
+                                    <th>Expiry Date</th>
+                                    <th>Days Left</th>
+                                    <th>Priority</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for medicine in medicines %}
+                                <tr>
+                                    <td>{{ medicine.medicine_id }}</td>
+                                    <td>
+                                        <strong>{{ medicine.name }}</strong>
+                                        {% if medicine.brand_name %}
+                                            <br><small class="text-muted">{{ medicine.brand_name }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ medicine.brand_name|default:"N/A" }}</td>
+                                    <td>{{ medicine.category }}</td>
+                                    <td>NRS {{ medicine.price|floatformat:2 }}</td>
+                                    <td>
+                                        <span class="badge {% if medicine.stock_qty <= 0 %}bg-danger{% elif medicine.stock_qty <= 10 %}bg-warning{% else %}bg-success{% endif %}">
+                                            {{ medicine.stock_qty }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="{% if medicine.exp_date <= today|add_days:7 %}text-danger{% else %}text-warning{% endif %}">
+                                            {{ medicine.exp_date|date:"Y-m-d" }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% with days_left=medicine.exp_date|timeuntil %}
+                                        <span class="badge {% if medicine.exp_date <= today|add_days:7 %}bg-danger{% elif medicine.exp_date <= today|add_days:14 %}bg-warning{% else %}bg-info{% endif %}">
+                                            {{ days_left|slice:":2" }} days
+                                        </span>
+                                        {% endwith %}
+                                    </td>
+                                    <td>
+                                        {% if medicine.exp_date <= today|add_days:7 %}
+                                            <span class="badge bg-danger">Critical</span>
+                                        {% elif medicine.exp_date <= today|add_days:14 %}
+                                            <span class="badge bg-warning">High</span>
+                                        {% else %}
+                                            <span class="badge bg-info">Medium</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'pharmacist_medicine_detail' medicine.medicine_id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="{% url 'pharmacist_medicine_edit' medicine.medicine_id %}" class="btn btn-sm btn-outline-warning">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-check-circle text-success fs-1"></i>
+                        <h4 class="mt-3">No Expiring Soon Medicines</h4>
+                        <p class="text-muted">All medicines have expiry dates beyond the next 30 days.</p>
+                        <a href="{% url 'pharmacist_medicine_list' %}" class="btn btn-primary">
+                            <i class="bi bi-list"></i> View All Medicines
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    $('#expiringSoonTable').DataTable({
+        "pageLength": 25,
+        "order": [[6, "asc"]], // Sort by expiry date ascending
+        "columnDefs": [
+            { "orderable": false, "targets": 9 }
+        ]
+    });
+});
+</script>
+{% endblock %}

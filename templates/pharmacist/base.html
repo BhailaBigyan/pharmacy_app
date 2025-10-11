@@ -5,50 +5,61 @@
   <meta charset="utf-8">
   <title>{% block title %}Pharmacy{% endblock %}</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
 
   <style>
     body {
       display: flex;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
     }
 
     /* Sidebar */
     .sidebar {
       width: 70px; /* default collapsed width */
       height: 100vh;
-      background-color: #343a40;
+      background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
       color: white;
       position: fixed;
-      transition: width 0.3s;
+      transition: width 0.3s ease;
       overflow-x: hidden;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+      z-index: 1000;
     }
 
     .sidebar.expanded {
-      width: 220px; /* width when expanded */
+      width: 250px; /* width when expanded */
     }
 
     .sidebar .nav-link {
-      color: #cfd8dc;
+      color: rgba(255, 255, 255, 0.9);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
+      padding: 12px 15px;
+      border-radius: 8px;
+      margin: 2px 8px;
+      transition: all 0.3s ease;
     }
 
     .sidebar .nav-link:hover {
-      background-color: #495057;
+      background: rgba(255, 255, 255, 0.15);
       color: #fff;
+      transform: translateX(2px);
     }
 
     .sidebar .nav-link i {
-      font-size: 1.2rem;
+      font-size: 1.3rem;
+      min-width: 20px;
     }
 
     .sidebar .nav-link span {
       display: none; /* hide text by default */
+      font-weight: 500;
     }
 
     .sidebar.expanded .nav-link span {
@@ -56,42 +67,67 @@
     }
 
     .sidebar .collapse .nav-link {
-      padding-left: 2rem;
+      padding-left: 2.5rem;
+      font-size: 0.9rem;
     }
 
     .content {
       margin-left: 70px;
       padding: 20px;
       width: 100%;
-      transition: margin-left 0.3s;
+      transition: margin-left 0.3s ease;
+      background: transparent;
     }
 
     .sidebar.expanded ~ .content {
-      margin-left: 220px;
+      margin-left: 250px;
     }
 
     .user-info {
-      padding: 10px;
+      padding: 15px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-      margin-bottom: 15px;
+      margin-bottom: 20px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      margin: 0 8px 20px 8px;
+      border-radius: 10px;
+    }
+
+    .user-info i {
+      font-size: 1.5rem;
     }
 
     .user-info span {
       display: none;
+      font-weight: 600;
     }
 
     .sidebar.expanded .user-info span {
       display: inline;
     }
 
+    .btn-outline-light {
+      border-color: rgba(255, 255, 255, 0.3);
+      color: rgba(255, 255, 255, 0.9);
+      transition: all 0.3s ease;
+    }
+
+    .btn-outline-light:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    /* Responsive Design */
     @media (max-width: 768px) {
       .sidebar {
         width: 100%;
         height: auto;
         position: relative;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
       }
 
       .sidebar.expanded {
@@ -100,7 +136,45 @@
 
       .content {
         margin-left: 0;
+        padding: 15px;
       }
+
+      .sidebar .nav-link span {
+        display: inline;
+      }
+
+      .user-info span {
+        display: inline;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .content {
+        padding: 10px;
+      }
+      
+      .sidebar .nav-link {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+      }
+    }
+
+    /* Custom scrollbar for sidebar */
+    .sidebar::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .sidebar::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 2px;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.5);
     }
   </style>
 </head>
@@ -121,7 +195,7 @@
         </a>
       </li>
 
-      <li>
+      <!-- <li>
         <a class="nav-link" data-bs-toggle="collapse" href="#medicineMenu" role="button" aria-expanded="false"
           aria-controls="medicineMenu">
           <i class="bi bi-capsule"></i>
@@ -134,7 +208,7 @@
             <li><a href="{% url 'list_medicine' %}" class="nav-link"><i class="bi bi-list"></i> <span>List Medicine</span></a></li>
           </ul>
         </div>
-      </li>
+      </li> -->
 
       <li>
         <a class="nav-link" data-bs-toggle="collapse" href="#stockMenu" role="button" aria-expanded="false"
@@ -161,6 +235,20 @@
             <li><a href="{% url 'add_supplier' %}" class="nav-link"><i class="bi bi-plus-circle"></i> <span>Add Supplier</span></a></li>
             <li><a href="{% url 'list_supplier' %}" class="nav-link"><i class="bi bi-list"></i> <span>Supplier List</span></a></li>
             <li><a href="{% url 'supplier_report' %}" class="nav-link"><i class="bi bi-file-earmark-text"></i> <span>Supplier Report</span></a></li>
+          </ul>
+        </div>
+      </li>
+
+      <li>
+        <a class="nav-link" data-bs-toggle="collapse" href="#billingMenu" role="button" aria-expanded="false"
+          aria-controls="billingMenu">
+          <i class="bi bi-receipt"></i>
+          <span>Billing</span>
+        </a>
+        <div class="collapse ps-3" id="billingMenu">
+          <ul class="nav flex-column">
+            <li><a href="{% url 'bill' %}" class="nav-link"><i class="bi bi-calculator"></i> <span>New Bill</span></a></li>
+            <li><a href="{% url 'sales_report' %}" class="nav-link"><i class="bi bi-graph-up"></i> <span>Sales Report</span></a></li>
           </ul>
         </div>
       </li>

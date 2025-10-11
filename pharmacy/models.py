@@ -8,6 +8,7 @@ class User(AbstractUser):
         ('staff', 'Staff'),
     ]
     role = models.CharField(max_length=50, choices=ROLE_CHOICES)
+    reset_token = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return self.username

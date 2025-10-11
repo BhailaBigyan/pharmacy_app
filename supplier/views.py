@@ -19,6 +19,21 @@ def add_supplier(request):
     
     return render(request, 'admin/supplier/add_supplier.html', {'form': form})
 
+def supplier_detail(request, supplier_id):
+    from datetime import date, timedelta
+    
+    supplier = get_object_or_404(Supplier, id=supplier_id)
+    medicines = Medicine.objects.filter(supplier=supplier)
+    today = date.today()
+    expiring_soon_date = today + timedelta(days=30)
+    
+    return render(request, 'admin/supplier/supplier_detail.html', {
+        'supplier': supplier,
+        'medicines': medicines,
+        'today': today,
+        'expiring_soon_date': expiring_soon_date,
+    })
+
 
 
 def supplier_report(request):

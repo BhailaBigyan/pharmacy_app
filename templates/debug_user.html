@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug User Info</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Debug User Information</h1>
+        <div class="card">
+            <div class="card-body">
+                <p><strong>Username:</strong> {{ username }}</p>
+                <p><strong>Role:</strong> {{ role }}</p>
+                <p><strong>Is Authenticated:</strong> {{ is_authenticated }}</p>
+                <p><strong>Is Staff:</strong> {{ is_staff }}</p>
+                <p><strong>Is Superuser:</strong> {{ is_superuser }}</p>
+                <p><strong>Is Active:</strong> {{ is_active }}</p>
+            </div>
+        </div>
+        <a href="{% url 'debug_admin' %}" class="btn btn-primary mt-3">Test Admin Access</a>
+        <a href="{% url 'index' %}" class="btn btn-secondary mt-3">Back to Home</a>
+    </div>
+</body>
+</html>

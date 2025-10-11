@@ -1,83 +1,268 @@
 {% extends "admin/base.html" %}
-{% block content %}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-<!-- DataTables CSS -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css">
+{% block title %}Stock Report - Admin Panel{% endblock %}
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1>Stock Report</h1>
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-3">
+                <i class="bi bi-box-seam"></i> Stock Report
+            </h1>
+            <p class="text-muted">Comprehensive stock analysis and inventory management</p>
+        </div>
     </div>
 
-    <table id="stockTable" class="table table-striped table-bordered">
-        <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Brand Name</th>
-                <th>Category</th>
-                <th>Price</th>
-                <th>Stock Qty</th>
-                <th>Mfg Date</th>
-                <th>Exp Date</th>
-                <th>Supplier</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for med in medicines %}
-            <tr>
-                <td>{{ med.medicine_id }}</td>
-                <td>{{ med.name }}</td>
-                <td>{{ med.brand_name }}</td>
-                <td>{{ med.get_category_display }}</td>
-                <td>{{ med.price }}</td>
-                <td>
-                    {% if med.stock_qty <= 0 %}
-                        <span class="badge bg-danger">Out of Stock</span>
-                    {% else %}
-                        {{ med.stock_qty }}
-                    {% endif %}
-                </td>
-                <td>{{ med.mfg_date }}</td>
-                <td>
-                    {% if med.exp_date < today %}
-                        <span class="badge bg-warning text-dark">Expired</span>
-                    {% else %}
-                        {{ med.exp_date }}
-                    {% endif %}
-                </td>
-                <td>{{ med.supplier.name }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="9" class="text-center">No stock data available.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card">
+                <div class="stat-number text-primary">{{ total_medicines }}</div>
+                <div class="stat-label">Total Medicines</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card">
+                <div class="stat-number text-success">{{ in_stock }}</div>
+                <div class="stat-label">In Stock</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card">
+                <div class="stat-number text-warning">{{ low_stock }}</div>
+                <div class="stat-label">Low Stock</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card">
+                <div class="stat-number text-danger">{{ out_of_stock }}</div>
+                <div class="stat-label">Out of Stock</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Options -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-funnel"></i> Filter Options
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label for="categoryFilter" class="form-label">Category</label>
+                            <select id="categoryFilter" class="form-select">
+                                <option value="">All Categories</option>
+                                <option value="Tablet">Tablet</option>
+                                <option value="Capsule">Capsule</option>
+                                <option value="Syrup">Syrup</option>
+                                <option value="Injection">Injection</option>
+                                <option value="Cream">Cream</option>
+                                <option value="Ointment">Ointment</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="stockFilter" class="form-label">Stock Status</label>
+                            <select id="stockFilter" class="form-select">
+                                <option value="">All</option>
+                                <option value="in-stock">In Stock</option>
+                                <option value="low-stock">Low Stock</option>
+                                <option value="out-of-stock">Out of Stock</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="expiryFilter" class="form-label">Expiry Status</label>
+                            <select id="expiryFilter" class="form-select">
+                                <option value="">All</option>
+                                <option value="expired">Expired</option>
+                                <option value="expiring-soon">Expiring Soon</option>
+                                <option value="valid">Valid</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-grid">
+                                <button onclick="applyFilters()" class="btn btn-primary">
+                                    <i class="bi bi-search"></i> Apply Filters
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stock Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-table"></i> Stock Inventory
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table" id="stockTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Brand</th>
+                                    <th>Category</th>
+                                    <th>Price</th>
+                                    <th>Stock</th>
+                                    <th>Mfg Date</th>
+                                    <th>Exp Date</th>
+                                    <th>Supplier</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for medicine in medicines %}
+                                <tr>
+                                    <td>{{ medicine.medicine_id }}</td>
+                                    <td>{{ medicine.name }}</td>
+                                    <td>{{ medicine.brand_name }}</td>
+                                    <td>{{ medicine.category }}</td>
+                                    <td>NRS {{ medicine.price|floatformat:2 }}</td>
+                                    <td>
+                                        <span class="badge {% if medicine.stock_qty <= 0 %}bg-danger{% elif medicine.stock_qty <= 10 %}bg-warning{% else %}bg-success{% endif %}">
+                                            {{ medicine.stock_qty }}
+                                        </span>
+                                    </td>
+                                    <td>{{ medicine.mfg_date|date:"Y-m-d" }}</td>
+                                    <td>
+                                        <span class="{% if medicine.exp_date < today %}text-danger{% endif %}">
+                                            {{ medicine.exp_date|date:"Y-m-d" }}
+                                        </span>
+                                    </td>
+                                    <td>{{ medicine.supplier.name|default:"N/A" }}</td>
+                                    <td>
+                                        {% if medicine.stock_qty <= 0 %}
+                                            <span class="badge bg-danger">Out of Stock</span>
+                                        {% elif medicine.stock_qty <= 10 %}
+                                            <span class="badge bg-warning">Low Stock</span>
+                                        {% else %}
+                                            <span class="badge bg-success">In Stock</span>
+                                        {% endif %}
+                                        {% if medicine.exp_date < today %}
+                                            <span class="badge bg-danger ms-1">Expired</span>
+                                        {% elif medicine.exp_date <= expiring_soon_date %}
+                                            <span class="badge bg-warning ms-1">Expiring Soon</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="10" class="text-center text-muted">No medicines found</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- Scripts -->
-<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<!-- DataTables -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
 
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css">
+
 <script>
-    $(document).ready(function () {
-        $('#stockTable').DataTable({
-            dom: 'Bfrtip',
-            buttons: [
-                'copy', 'excel', 'pdf', 'print'
-            ]
-        });
+$(document).ready(function() {
+    var table = $('#stockTable').DataTable({
+        "order": [[ 0, "asc" ]],
+        "pageLength": 25,
+        "responsive": true,
+        "dom": 'Bfrtip',
+        "buttons": [
+            {
+                extend: 'excel',
+                text: '<i class="bi bi-file-excel"></i> Excel',
+                className: 'btn btn-success btn-sm'
+            },
+            {
+                extend: 'pdf',
+                text: '<i class="bi bi-file-pdf"></i> PDF',
+                className: 'btn btn-danger btn-sm'
+            },
+            {
+                extend: 'print',
+                text: '<i class="bi bi-printer"></i> Print',
+                className: 'btn btn-primary btn-sm'
+            }
+        ]
     });
+
+    // Custom search function for stock filtering
+    $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+        var category = $('#categoryFilter').val();
+        var stock = $('#stockFilter').val();
+        var expiry = $('#expiryFilter').val();
+        
+        // Category filter
+        if (category && data[3] !== category) {
+            return false;
+        }
+        
+        // Stock filter
+        if (stock) {
+            var stockValue = parseInt(data[6].replace(/[^\d]/g, ''));
+            if (stock === 'in-stock' && stockValue <= 10) {
+                return false;
+            } else if (stock === 'low-stock' && (stockValue === 0 || stockValue > 10)) {
+                return false;
+            } else if (stock === 'out-of-stock' && stockValue !== 0) {
+                return false;
+            }
+        }
+        
+        // Expiry filter (simplified - just check for text color classes)
+        if (expiry) {
+            var expiryCell = data[8];
+            if (expiry === 'expired' && !expiryCell.includes('text-danger')) {
+                return false;
+            } else if (expiry === 'expiring-soon' && !expiryCell.includes('text-warning')) {
+                return false;
+            } else if (expiry === 'valid' && (expiryCell.includes('text-danger') || expiryCell.includes('text-warning'))) {
+                return false;
+            }
+        }
+        
+        return true;
+    });
+
+    // Filter functions
+    window.applyFilters = function() {
+        table.draw();
+    };
+    
+    // Real-time filtering
+    $('#categoryFilter').on('change', function() {
+        applyFilters();
+    });
+    
+    $('#stockFilter').on('change', function() {
+        applyFilters();
+    });
+    
+    $('#expiryFilter').on('change', function() {
+        applyFilters();
+    });
+});
 </script>
 {% endblock %}
