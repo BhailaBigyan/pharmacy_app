@@ -5,7 +5,7 @@ The Pharmacy Management System is a web-based application designed to streamline
 ## Authors
 
 - [@bhailabigyan](https://www.github.com/bhailabigyan)
-- [@sinkhwalsubash](https://www/github.com/sinkhwal07)
+- [@sinkhwalsubash](https://www.github.com/sinkhwal07)
 
 
 ## Running Tests
