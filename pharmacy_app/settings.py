@@ -28,9 +28,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_filters',
-    'pharmacy',
-    'medicine',
-    'supplier',
+    'pharmacy', # Custom user model and authentication
+    'medicine', # For medicine management
+    'supplier', # For supplier management
+    'billing', # For billing management
 ]
 
 MIDDLEWARE = [

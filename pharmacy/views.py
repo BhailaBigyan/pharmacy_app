@@ -107,3 +107,20 @@ def register_view(request):
     else:
         form = UserRegistrationForm()
     return render(request, "register.html", {"form": form})
+
+
+
+
+# For pharmacist dashboard
+@login_required
+def pharmacist_dashboard(request):
+    total_medicines = Medicine.objects.count()
+    out_of_stock = Medicine.objects.filter(stock_qty__lte=0).count()
+    expired_medicines = Medicine.objects.filter(exp_date__lt=timezone.now().date()).count()
+
+    context = {
+        'total_medicines': total_medicines,
+        'out_of_stock': out_of_stock,
+        'expired_medicines': expired_medicines,
+    }
+    return render(request, 'pharmacist/dashboard.html', context)
