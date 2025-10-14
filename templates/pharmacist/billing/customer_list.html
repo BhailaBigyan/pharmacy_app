@@ -1,0 +1,49 @@
+{% extends 'pharmacist/base.html' %}
+{% block title %}Customers{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row mb-3">
+    <div class="col-12">
+      <h1><i class="bi bi-people"></i> Customers</h1>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Email</th>
+              <th>Joined</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in customers %}
+            <tr>
+              <td>{{ c.name }}</td>
+              <td>{{ c.phone_number|default:'-' }}</td>
+              <td>{{ c.email|default:'-' }}</td>
+              <td>{{ c.created_at|date:"Y-m-d" }}</td>
+              <td>
+                <a class="btn btn-primary btn-sm" href="{% url 'customer_detail' c.customer_id %}">
+                  View
+                </a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center">No customers found.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+

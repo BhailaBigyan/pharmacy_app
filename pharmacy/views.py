@@ -136,14 +136,32 @@ def test_forgot_password(request):
 def index(request):
     # Redirect based on user role
     if request.user.role == 'admin':
+        from datetime import timedelta
+
         total_medicines = Medicine.objects.count()
         out_of_stock = Medicine.objects.filter(stock_qty__lte=0).count()
         expired_medicines = Medicine.objects.filter(exp_date__lt=timezone.now().date()).count()
+
+        today = timezone.now().date()
+        three_days_from_now = today + timedelta(days=3)
+
+        # Medicines expiring within next 3 days (but not already expired)
+        expiring_in_3_days = Medicine.objects.filter(
+            exp_date__gt=today,
+            exp_date__lte=three_days_from_now
+        ).order_by('exp_date')
+
+        # Low stock threshold set to 10 units (includes >0 to exclude out of stock)
+        low_stock_qs = Medicine.objects.filter(stock_qty__gt=0, stock_qty__lte=10).order_by('stock_qty', 'name')
 
         context = {
             'total_medicines': total_medicines,
             'out_of_stock': out_of_stock,
             'expired_medicines': expired_medicines,
+            'expiring_in_3_days_count': expiring_in_3_days.count(),
+            'expiring_in_3_days_list': expiring_in_3_days[:5],  # show first 5
+            'low_stock_count': low_stock_qs.count(),
+            'low_stock_list': low_stock_qs[:5],  # show first 5
         }
         return render(request, 'admin/dashboard.html', context)
     elif request.user.role == 'pharmacist':
@@ -281,6 +299,53 @@ def pharmacist_dashboard(request):
         'sales_trend': sales_trend_json,
     }
     return render(request, 'pharmacist/dashboard.html', context)
+
+@admin_required
+def admin_notifications(request):
+    from datetime import timedelta
+    today = timezone.now().date()
+    three_days_from_now = today + timedelta(days=3)
+
+    expiring_in_3_days = Medicine.objects.filter(
+        exp_date__gt=today,
+        exp_date__lte=three_days_from_now
+    ).order_by('exp_date')
+
+    low_stock_qs = Medicine.objects.filter(stock_qty__gt=0, stock_qty__lte=10).order_by('stock_qty', 'name')
+    out_of_stock_qs = Medicine.objects.filter(stock_qty__lte=0).order_by('name')
+    expired_qs = Medicine.objects.filter(exp_date__lt=today).order_by('exp_date')
+
+    context = {
+        'today': today,
+        'expiring_in_3_days': expiring_in_3_days,
+        'expiring_in_3_days_count': expiring_in_3_days.count(),
+        'low_stock_list': low_stock_qs,
+        'low_stock_count': low_stock_qs.count(),
+        'out_of_stock_list': out_of_stock_qs,
+        'out_of_stock_count': out_of_stock_qs.count(),
+        'expired_list': expired_qs,
+        'expired_count': expired_qs.count(),
+    }
+    
+    # Send email when requested
+    if request.method == 'POST' and request.POST.get('action') == 'send_email':
+        from django.conf import settings
+        from django.template.loader import render_to_string
+        from django.core.mail import EmailMultiAlternatives
+        subject = 'Pharmacy Notifications Summary'
+        to_email = getattr(settings, 'ADMIN_EMAIL', None)
+        if to_email:
+            html_content = render_to_string('emails/notifications_summary.html', context)
+            text_content = f"Expiring in 3 days: {context['expiring_in_3_days_count']}, Low stock: {context['low_stock_count']}, Out of stock: {context['out_of_stock_count']}, Expired: {context['expired_count']}"
+            email = EmailMultiAlternatives(subject, text_content, settings.DEFAULT_FROM_EMAIL, [to_email])
+            email.attach_alternative(html_content, 'text/html')
+            email.send(fail_silently=True)
+            messages.success(request, 'Notifications summary email sent to admin.')
+        else:
+            messages.error(request, 'Admin email is not configured. Set ADMIN_EMAIL in settings.')
+        return redirect('admin_notifications')
+
+    return render(request, 'admin/notifications.html', context)
 
 # For staff dashboard
 @staff_required

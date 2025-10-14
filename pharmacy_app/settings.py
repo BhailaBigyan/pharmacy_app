@@ -125,3 +125,9 @@ LOGOUT_REDIRECT_URL = '/login/'
 
 AUTHENTICATION_BACKENDS = ['pharmacy.backends.CustomUserBackend']
 AUTH_USER_MODEL = 'pharmacy.User'
+
+# Email settings (configure properly in production)
+# These defaults use console backend for dev; replace with SMTP settings as needed
+EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'no-reply@example.com')
+ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'admin@example.com')

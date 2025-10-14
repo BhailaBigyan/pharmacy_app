@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <h2>Pharmacy Notifications Summary</h2>
+  <p>Date: {{ today|date:"Y-m-d" }}</p>
+
+  <h3>Expiring within 3 days ({{ expiring_in_3_days_count }})</h3>
+  {% if expiring_in_3_days_count %}
+  <ul>
+    {% for med in expiring_in_3_days %}
+    <li>{{ med.name }}{% if med.brand_name %} ({{ med.brand_name }}){% endif %} - {{ med.exp_date|date:"Y-m-d" }}</li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>No medicines expiring in the next 3 days.</p>
+  {% endif %}
+
+  <h3>Low stock ({{ low_stock_count }})</h3>
+  {% if low_stock_count %}
+  <ul>
+    {% for med in low_stock_list %}
+    <li>{{ med.name }}{% if med.brand_name %} ({{ med.brand_name }}){% endif %} - Stock: {{ med.stock_qty }}</li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>No low stock items.</p>
+  {% endif %}
+
+  <h3>Out of stock ({{ out_of_stock_count }})</h3>
+  {% if out_of_stock_count %}
+  <ul>
+    {% for med in out_of_stock_list %}
+    <li>{{ med.name }}{% if med.brand_name %} ({{ med.brand_name }}){% endif %}</li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>No out of stock items.</p>
+  {% endif %}
+
+  <h3>Already expired ({{ expired_count }})</h3>
+  {% if expired_count %}
+  <ul>
+    {% for med in expired_list %}
+    <li>{{ med.name }}{% if med.brand_name %} ({{ med.brand_name }}){% endif %} - {{ med.exp_date|date:"Y-m-d" }}</li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>No expired medicines.</p>
+  {% endif %}
+
+</body>
+</html>
+

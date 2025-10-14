@@ -1,0 +1,163 @@
+{% extends 'admin/base.html' %}
+{% block title %}Notifications - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-3">
+                <i class="bi bi-bell"></i> Notifications
+            </h1>
+            <p class="text-muted">Key stock and expiry alerts.</p>
+            <form method="post" class="mt-2">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="send_email" />
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-envelope"></i> Email this summary to admin
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 col-lg-6 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-exclamation-triangle"></i> Expiring within 3 days ({{ expiring_in_3_days_count }})
+                </div>
+                <div class="card-body">
+                    {% if expiring_in_3_days_count %}
+                    <div class="alert alert-warning">
+                        Review and plan actions for these medicines.
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Brand</th>
+                                    <th>Expiry Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for med in expiring_in_3_days %}
+                                <tr>
+                                    <td>{{ med.name }}</td>
+                                    <td>{{ med.brand_name }}</td>
+                                    <td>{{ med.exp_date|date:"Y-m-d" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                        <div class="alert alert-success mb-0">No medicines expiring in the next 3 days.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-6 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-battery"></i> Low stock ({{ low_stock_count }})
+                </div>
+                <div class="card-body">
+                    {% if low_stock_count %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Brand</th>
+                                    <th>Stock</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for med in low_stock_list %}
+                                <tr>
+                                    <td>{{ med.name }}</td>
+                                    <td>{{ med.brand_name }}</td>
+                                    <td>{{ med.stock_qty }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                        <div class="alert alert-success mb-0">No low stock items right now.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-6 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-x-octagon"></i> Out of stock ({{ out_of_stock_count }})
+                </div>
+                <div class="card-body">
+                    {% if out_of_stock_count %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Brand</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for med in out_of_stock_list %}
+                                <tr>
+                                    <td>{{ med.name }}</td>
+                                    <td>{{ med.brand_name }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                        <div class="alert alert-success mb-0">Nothing is out of stock.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-6 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-calendar-x"></i> Already expired ({{ expired_count }})
+                </div>
+                <div class="card-body">
+                    {% if expired_count %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Brand</th>
+                                    <th>Expiry Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for med in expired_list %}
+                                <tr>
+                                    <td>{{ med.name }}</td>
+                                    <td>{{ med.brand_name }}</td>
+                                    <td>{{ med.exp_date|date:"Y-m-d" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                        <div class="alert alert-success mb-0">No expired medicines. Great!</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

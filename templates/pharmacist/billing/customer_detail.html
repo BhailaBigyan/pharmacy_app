@@ -1,0 +1,91 @@
+{% extends 'pharmacist/base.html' %}
+{% block title %}Customer: {{ customer.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row mb-3">
+    <div class="col-12">
+      <h1><i class="bi bi-person"></i> {{ customer.name }}</h1>
+      <p class="text-muted">Phone: {{ customer.phone_number|default:'-' }} | Email: {{ customer.email|default:'-' }}</p>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">Summary</div>
+        <div class="card-body">
+          <p><strong>Total Orders:</strong> {{ total_orders }}</p>
+          <p><strong>Total Items:</strong> {{ total_items }}</p>
+          <p><strong>Total Spent:</strong> NRS {{ total_spent|floatformat:2 }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">Recent Orders</div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Invoice #</th>
+                  <th>Date</th>
+                  <th>Total</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for inv in invoices %}
+                <tr>
+                  <td>{{ inv.invoice_id }}</td>
+                  <td>{{ inv.created_at|date:"Y-m-d H:i" }}</td>
+                  <td>NRS {{ inv.total|floatformat:2 }}</td>
+                  <td><a class="btn btn-secondary btn-sm" href="{% url 'invoice_detail' inv.invoice_id %}">Details</a></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center">No orders yet.</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">Purchased Items</div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Invoice #</th>
+              <th>Medicine</th>
+              <th>Quantity</th>
+              <th>Price</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in items %}
+            <tr>
+              <td>{{ item.invoice.invoice_id }}</td>
+              <td>{{ item.medicine.name }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>NRS {{ item.price|floatformat:2 }}</td>
+              <td>NRS {{ item.total|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center">No items found.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
