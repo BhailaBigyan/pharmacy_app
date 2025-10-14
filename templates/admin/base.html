@@ -363,9 +363,16 @@
                 <i class="bi bi-hospital"></i>
                 Pharmacy Management
             </a>
+
             <div class="user-info">
+                <i class="bi bi-person-circle"></i>
                 {% if user.is_authenticated %}
                     <span class="user-name">{{ user.get_full_name|default:user.username }}</span>
+               
+                        <a href="{% url 'admin_notifications' %}" class="btn btn-outline-primary btn-sm" title="Notifications">
+                            <i class="bi bi-bell"></i> 
+                        </a>
+                    
                     <span class="user-role">{{ user.get_role_display|default:user.role|title }}</span>
                     <a href="{% url 'logout' %}" class="btn btn-outline-primary btn-sm">
                         <i class="bi bi-box-arrow-right"></i> Logout
@@ -386,11 +393,7 @@
                             <i class="bi bi-speedometer2"></i> Admin Dashboard
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="{% url 'admin_notifications' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_notifications' %}active{% endif %}">
-                            <i class="bi bi-bell"></i> Notifications
-                        </a>
-                    </li>
+                    
                     <li class="nav-item">
                         <a href="{% url 'list_medicine' %}" class="nav-link">
                             <i class="bi bi-capsule"></i> Medicines

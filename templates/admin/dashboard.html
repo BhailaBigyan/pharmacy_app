@@ -1,23 +1,68 @@
 {% extends 'admin/base.html' %}
-{% block title %}Admin Dashboard - Admin Pannel{% endblock %}
+{% block title %}Admin Dashboard - Admin Panel{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
-    {# Notifications Row #}
-    {# Notifications moved to a dedicated page #}
-
-    <div class="row mb-4">
-        <div class="col-12">
-            <h1 class="mb-3">
+    <!-- Header -->
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-8">
+            <h1 class="mb-1">
                 <i class="bi bi-speedometer2"></i> Admin Dashboard
             </h1>
-            <p class="text-muted">Welcome back, {{ request.user.get_full_name|default:request.user.username }}!</p>
+            <p class="text-muted mb-0">
+                Welcome back, {{ request.user.get_full_name|default:request.user.username }}!
+            </p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <a href="{% url 'admin_notifications' %}" class="btn btn-outline-primary">
+                <i class="bi bi-bell"></i> View All Notifications
+            </a>
+        </div>
+    </div>
+
+    <!-- Notification Overview Row -->
+    <div class="row mb-4 g-3">
+        <div class="col-md-3 col-6">
+            <div class="card text-center border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <i class="bi bi-hourglass-split text-warning fs-3 mb-2"></i>
+                    <h6 class="mb-0 text-muted">Expiring Soon</h6>
+                    <h4 class="fw-bold text-warning mt-1">{{ expiring_in_3_days_count }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card text-center border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <i class="bi bi-box-seam text-danger fs-3 mb-2"></i>
+                    <h6 class="mb-0 text-muted">Low Stock</h6>
+                    <h4 class="fw-bold text-danger mt-1">{{ low_stock_count }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card text-center border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <i class="bi bi-archive text-secondary fs-3 mb-2"></i>
+                    <h6 class="mb-0 text-muted">Out of Stock</h6>
+                    <h4 class="fw-bold text-secondary mt-1">{{ out_of_stock_count }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card text-center border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <i class="bi bi-exclamation-triangle text-dark fs-3 mb-2"></i>
+                    <h6 class="mb-0 text-muted">Expired</h6>
+                    <h4 class="fw-bold text-dark mt-1">{{ expired_count }}</h4>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Key Metrics Row -->
-    <div class="row mb-4">
-        <div class="col-lg-4 col-md-6 mb-3">
+    <div class="row mb-4 g-3">
+        <div class="col-lg-4 col-md-6">
             <div class="stat-card">
                 <div class="stat-number">{{ total_medicines }}</div>
                 <div class="stat-label">Total Medicines</div>
@@ -25,7 +70,7 @@
             </div>
         </div>
         
-        <div class="col-lg-4 col-md-6 mb-3">
+        <div class="col-lg-4 col-md-6">
             <div class="stat-card">
                 <div class="stat-number text-warning">{{ out_of_stock }}</div>
                 <div class="stat-label">Out of Stock</div>
@@ -33,7 +78,7 @@
             </div>
         </div>
         
-        <div class="col-lg-4 col-md-6 mb-3">
+        <div class="col-lg-4 col-md-6">
             <div class="stat-card">
                 <div class="stat-number text-danger">{{ expired_medicines }}</div>
                 <div class="stat-label">Expired Medicines</div>
@@ -45,30 +90,30 @@
     <!-- Quick Actions -->
     <div class="row">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light">
                     <h5 class="mb-0">
                         <i class="bi bi-lightning"></i> Quick Actions
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3 mb-3">
+                    <div class="row g-3">
+                        <div class="col-md-3">
                             <a href="{% url 'add_medicine' %}" class="btn btn-primary w-100">
                                 <i class="bi bi-plus-circle"></i> Add Medicine
                             </a>
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-3">
                             <a href="{% url 'list_medicine' %}" class="btn btn-secondary w-100">
                                 <i class="bi bi-list"></i> Manage Medicines
                             </a>
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-3">
                             <a href="{% url 'add_supplier' %}" class="btn btn-success w-100">
                                 <i class="bi bi-truck"></i> Add Supplier
                             </a>
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-3">
                             <a href="{% url 'stock_report' %}" class="btn btn-warning w-100">
                                 <i class="bi bi-graph-up"></i> Stock Report
                             </a>
@@ -78,5 +123,98 @@
             </div>
         </div>
     </div>
+
+    <!-- Dynamic Notification Table (Bottom Section) -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light d-flex align-items-center justify-content-between">
+                    <h5 class="mb-0"><i class="bi bi-bell"></i> Recent Notifications</h5>
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="send_email">
+                        <button type="submit" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-envelope"></i> Email Summary
+                        </button>
+                    </form>
+                </div>
+                <div class="card-body p-0">
+                    {% if expiring_in_3_days or low_stock_list or out_of_stock_list or expired_list %}
+                    <div class="table-responsive">
+                        <table class="table table-striped mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Medicine</th>
+                                    <th>Brand</th>
+                                    <th>Status</th>
+                                    <th>Detail</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for med in expiring_in_3_days %}
+                                <tr>
+                                    <td>{{ med.name }}</td>
+                                    <td>{{ med.brand_name }}</td>
+                                    <td><span class="badge bg-warning text-dark">Expiring Soon</span></td>
+                                    <td>{{ med.exp_date|date:"Y-m-d" }}</td>
+                                </tr>
+                                {% endfor %}
+                                {% for med in low_stock_list %}
+                                <tr>
+                                    <td>{{ med.name }}</td>
+                                    <td>{{ med.brand_name }}</td>
+                                    <td><span class="badge bg-danger">Low Stock</span></td>
+                                    <td>{{ med.stock_qty }}</td>
+                                </tr>
+                                {% endfor %}
+                                {% for med in out_of_stock_list %}
+                                <tr>
+                                    <td>{{ med.name }}</td>
+                                    <td>{{ med.brand_name }}</td>
+                                    <td><span class="badge bg-secondary">Out of Stock</span></td>
+                                    <td>-</td>
+                                </tr>
+                                {% endfor %}
+                                {% for med in expired_list %}
+                                <tr>
+                                    <td>{{ med.name }}</td>
+                                    <td>{{ med.brand_name }}</td>
+                                    <td><span class="badge bg-dark">Expired</span></td>
+                                    <td>{{ med.exp_date|date:"Y-m-d" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                        <div class="p-4 text-center text-muted">No new notifications 🎉</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+.stat-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    text-align: center;
+    transition: 0.3s;
+}
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+}
+.stat-number {
+    font-size: 2rem;
+    font-weight: 600;
+}
+.stat-label {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+</style>
 {% endblock %}
