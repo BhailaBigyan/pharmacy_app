@@ -14,6 +14,8 @@ SECRET_KEY = 'django-insecure-linfk6dl#^npscg$gt^70^xi9nx8e4duj=hp+@q2!38ouw84)%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
+
 
 
 
@@ -127,7 +129,12 @@ AUTHENTICATION_BACKENDS = ['pharmacy.backends.CustomUserBackend']
 AUTH_USER_MODEL = 'pharmacy.User'
 
 # Email settings (configure properly in production)
-# These defaults use console backend for dev; replace with SMTP settings as needed
-EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'no-reply@example.com')
-ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'admin@example.com')
+# SMTP settings for real email sending
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # Switch to SMTP for real email sending
+EMAIL_HOST = 'smtp.gmail.com'  # For Gmail, change to your provider's SMTP server
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'danfetest@gmail.com'  # Your email
+EMAIL_HOST_PASSWORD = 'uksc hffl crrg fwwy'  # Gmail App Password
+DEFAULT_FROM_EMAIL = 'danfetest@gmail.com'
+ADMIN_EMAIL = 'bigyanbhaila98@gmail.com'

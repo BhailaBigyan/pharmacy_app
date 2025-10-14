@@ -332,15 +332,19 @@ def admin_notifications(request):
         from django.conf import settings
         from django.template.loader import render_to_string
         from django.core.mail import EmailMultiAlternatives
-        subject = 'Pharmacy Notifications Summary'
+        from datetime import datetime
+        subject = f'Pharmacy Notifications Summary - {datetime.now().strftime("%Y-%m-%d %H:%M")}'
         to_email = getattr(settings, 'ADMIN_EMAIL', None)
         if to_email:
             html_content = render_to_string('emails/notifications_summary.html', context)
             text_content = f"Expiring in 3 days: {context['expiring_in_3_days_count']}, Low stock: {context['low_stock_count']}, Out of stock: {context['out_of_stock_count']}, Expired: {context['expired_count']}"
             email = EmailMultiAlternatives(subject, text_content, settings.DEFAULT_FROM_EMAIL, [to_email])
             email.attach_alternative(html_content, 'text/html')
-            email.send(fail_silently=True)
-            messages.success(request, 'Notifications summary email sent to admin.')
+            try:
+                email.send(fail_silently=False)
+                messages.success(request, 'Notifications summary email sent to admin.')
+            except Exception as e:
+                messages.error(request, f'Failed to send email: {str(e)}')
         else:
             messages.error(request, 'Admin email is not configured. Set ADMIN_EMAIL in settings.')
         return redirect('admin_notifications')
