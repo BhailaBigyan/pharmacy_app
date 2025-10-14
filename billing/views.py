@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from pharmacy.decorators import pharmacist_or_staff_required
 import json
 
-from .models import Invoice, InvoiceItem
+from .models import Invoice, InvoiceItem, Customer
 from medicine.models import Medicine  # ✅ correct import
 
 # -------------------------------
@@ -76,8 +76,21 @@ def generate_invoice(request):
                     except ValueError:
                         return JsonResponse({"error": "Invalid return amount value"}, status=400)
 
+            # Find or create customer (by phone when provided else by name)
+            customer = None
+            if phone_number:
+                customer, _ = Customer.objects.get_or_create(
+                    phone_number=phone_number,
+                    defaults={"name": customer_name}
+                )
+            else:
+                customer, _ = Customer.objects.get_or_create(
+                    name=customer_name,
+                )
+
             # Create invoice
             invoice = Invoice.objects.create(
+                customer=customer,
                 customer_name=customer_name,
                 phone_number=phone_number,
                 payment_method=payment_method,
@@ -172,3 +185,34 @@ def sales_report(request):
         "end_date": end_date,
     }
     return render(request, "pharmacist/billing/sales_report_new.html", context)
+
+
+# -------------------------------
+# Customer List & Detail
+# -------------------------------
+@pharmacist_or_staff_required
+def customer_list(request):
+    customers = Customer.objects.all().order_by('-created_at')
+    return render(request, 'pharmacist/billing/customer_list.html', {
+        'customers': customers,
+    })
+
+
+@pharmacist_or_staff_required
+def customer_detail(request, customer_id):
+    customer = get_object_or_404(Customer, customer_id=customer_id)
+    invoices = customer.invoices.all().order_by('-created_at')
+    # Flatten purchased items across invoices
+    items = InvoiceItem.objects.filter(invoice__in=invoices).select_related('medicine', 'invoice')
+    total_spent = sum(inv.total for inv in invoices)
+    total_orders = invoices.count()
+    total_items = sum(item.quantity for item in items)
+
+    return render(request, 'pharmacist/billing/customer_detail.html', {
+        'customer': customer,
+        'invoices': invoices,
+        'items': items,
+        'total_spent': total_spent,
+        'total_orders': total_orders,
+        'total_items': total_items,
+    })
