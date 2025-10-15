@@ -39,8 +39,15 @@
                                 {% endif %}
                             </div>
                         </div>
-
+                        
                         <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.batch_number.id_for_label }}" class="form-label">Batch Number *</label>
+                                {{ form.batch_number }}
+                                {% if form.batch_number.errors %}
+                                    <div class="text-danger small">{{ form.batch_number.errors.0 }}</div>
+                                {% endif %}
+                            </div>
                             <div class="col-md-6 mb-3">
                                 <label for="{{ form.category.id_for_label }}" class="form-label">Category *</label>
                                 {{ form.category }}
@@ -48,13 +55,7 @@
                                     <div class="text-danger small">{{ form.category.errors.0 }}</div>
                                 {% endif %}
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.company.id_for_label }}" class="form-label">Company *</label>
-                                {{ form.company }}
-                                {% if form.company.errors %}
-                                    <div class="text-danger small">{{ form.company.errors.0 }}</div>
-                                {% endif %}
-                            </div>
+                            
                         </div>
 
                         <div class="row">
@@ -99,13 +100,7 @@
                                     <div class="text-danger small">{{ form.supplier.errors.0 }}</div>
                                 {% endif %}
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
-                                {{ form.description }}
-                                {% if form.description.errors %}
-                                    <div class="text-danger small">{{ form.description.errors.0 }}</div>
-                                {% endif %}
-                            </div>
+                           
                         </div>
 
                         <div class="d-flex gap-2 mt-4">

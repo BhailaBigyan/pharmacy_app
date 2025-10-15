@@ -5,6 +5,7 @@ class Medicine(models.Model):
     medicine_id = models.AutoField(primary_key=True)   # custom PK
     name = models.CharField(max_length=100)
     brand_name = models.CharField(max_length=100)
+    batch_number = models.CharField(max_length=50, null=True, blank=True)
     
     CATEGORY_CHOICES = [
         ("tablet/capsule", "Tablet/Capsule"),
