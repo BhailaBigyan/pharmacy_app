@@ -28,8 +28,8 @@
                             {{ filter.form.name }}
                         </div>
                         <div class="col-md-3">
-                            <label for="id_brand_name" class="form-label">Brand</label>
-                            {{ filter.form.brand_name }}
+                            <label for="id_batch_number" class="form-label">Batch Number</label>
+                            {{ filter.form.batch_number }}
                         </div>
                         <div class="col-md-3">
                             <label for="id_category" class="form-label">Category</label>
@@ -88,8 +88,8 @@
                                     <th>ID</th>
                                     <th>Name</th>
                                     <th>Brand</th>
+                                    <th>Batch Number</th>
                                     <th>Category</th>
-                                    <th>Company</th>
                                     <th>Price</th>
                                     <th>Stock</th>
                                     <th>Mfg Date</th>
@@ -104,8 +104,8 @@
                                     <td>{{ medicine.medicine_id }}</td>
                                     <td>{{ medicine.name }}</td>
                                     <td>{{ medicine.brand_name }}</td>
+                                    <td>{{ medicine.batch_number }}</td>
                                     <td>{{ medicine.category }}</td>
-                                    <td>{{ medicine.company }}</td>
                                     <td>NRS {{ medicine.price|floatformat:2 }}</td>
                                     <td>
                                         <span class="badge {% if medicine.stock_qty <= 0 %}bg-danger{% elif medicine.stock_qty <= 10 %}bg-warning{% else %}bg-success{% endif %}">

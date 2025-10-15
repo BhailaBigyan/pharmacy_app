@@ -5,9 +5,7 @@
 <div class="container-fluid">
     <div class="row mb-4">
         <div class="col-12">
-            <h1 class="mb-3">
-                <i class="bi bi-box-seam"></i> Stock Report
-            </h1>
+            <h1 class="mb-3"><i class="bi bi-box-seam"></i> Stock Report</h1>
             <p class="text-muted">Comprehensive stock analysis and inventory management</p>
         </div>
     </div>
@@ -45,9 +43,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="bi bi-funnel"></i> Filter Options
-                    </h5>
+                    <h5 class="mb-0"><i class="bi bi-funnel"></i> Filter Options</h5>
                 </div>
                 <div class="card-body">
                     <div class="row g-3">
@@ -55,12 +51,10 @@
                             <label for="categoryFilter" class="form-label">Category</label>
                             <select id="categoryFilter" class="form-select">
                                 <option value="">All Categories</option>
-                                <option value="Tablet">Tablet</option>
-                                <option value="Capsule">Capsule</option>
-                                <option value="Syrup">Syrup</option>
-                                <option value="Injection">Injection</option>
-                                <option value="Cream">Cream</option>
-                                <option value="Ointment">Ointment</option>
+                                <option value="tablet/capsule">Tablet/Capsule</option>
+                                <option value="liquid">Liquid</option>
+                                <option value="patch">Patch</option>
+                                <option value="cream">Topical Cream</option>
                             </select>
                         </div>
                         <div class="col-md-3">
@@ -99,11 +93,7 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="bi bi-table"></i> Stock Inventory
-                    </h5>
-                </div>
+                <div class="card-header"><h5 class="mb-0"><i class="bi bi-table"></i> Stock Inventory</h5></div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table" id="stockTable">
@@ -112,6 +102,7 @@
                                     <th>ID</th>
                                     <th>Name</th>
                                     <th>Brand</th>
+                                    <th>Batch Number</th>
                                     <th>Category</th>
                                     <th>Price</th>
                                     <th>Stock</th>
@@ -127,6 +118,7 @@
                                     <td>{{ medicine.medicine_id }}</td>
                                     <td>{{ medicine.name }}</td>
                                     <td>{{ medicine.brand_name }}</td>
+                                    <td>{{ medicine.batch_number }}</td>
                                     <td>{{ medicine.category }}</td>
                                     <td>NRS {{ medicine.price|floatformat:2 }}</td>
                                     <td>
@@ -136,7 +128,7 @@
                                     </td>
                                     <td>{{ medicine.mfg_date|date:"Y-m-d" }}</td>
                                     <td>
-                                        <span class="{% if medicine.exp_date < today %}text-danger{% endif %}">
+                                        <span class="{% if medicine.exp_date < today %}text-danger{% elif medicine.exp_date <= expiring_soon_date %}text-warning{% else %}text-success{% endif %}">
                                             {{ medicine.exp_date|date:"Y-m-d" }}
                                         </span>
                                     </td>
@@ -157,9 +149,7 @@
                                     </td>
                                 </tr>
                                 {% empty %}
-                                <tr>
-                                    <td colspan="10" class="text-center text-muted">No medicines found</td>
-                                </tr>
+                                <tr><td colspan="10" class="text-center text-muted">No medicines found</td></tr>
                                 {% endfor %}
                             </tbody>
                         </table>
@@ -169,8 +159,10 @@
         </div>
     </div>
 </div>
+<!-- jQuery (required by DataTables) -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-<!-- DataTables -->
+<!-- DataTables & Buttons (already included in your template; keep them) -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
@@ -179,90 +171,132 @@
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
 
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css">
-
 <script>
 $(document).ready(function() {
+    // Parse dates from Django context (format YYYY-MM-DD). Make sure these are present in context.
+    var today = new Date("{{ today|date:'Y-m-d' }}");
+    var expiringSoonDate = new Date("{{ expiring_soon_date|date:'Y-m-d' }}");
+
+    // Init DataTable with buttons including Print
     var table = $('#stockTable').DataTable({
-        "order": [[ 0, "asc" ]],
-        "pageLength": 25,
-        "responsive": true,
-        "dom": 'Bfrtip',
-        "buttons": [
-            {
-                extend: 'excel',
-                text: '<i class="bi bi-file-excel"></i> Excel',
-                className: 'btn btn-success btn-sm'
-            },
-            {
-                extend: 'pdf',
-                text: '<i class="bi bi-file-pdf"></i> PDF',
-                className: 'btn btn-danger btn-sm'
-            },
-            {
-                extend: 'print',
-                text: '<i class="bi bi-printer"></i> Print',
-                className: 'btn btn-primary btn-sm'
+        order: [[0, 'asc']],
+        pageLength: 25,
+        responsive: true,
+        dom: 'Bfrtip',
+        buttons: [
+            { extend: 'excelHtml5', text: '<i class="bi bi-file-excel"></i> Excel', className: 'btn btn-success btn-sm' },
+            { extend: 'pdfHtml5', text: '<i class="bi bi-file-pdf"></i> PDF', className: 'btn btn-danger btn-sm' },
+            { extend: 'print', text: '<i class="bi bi-printer"></i> Print', className: 'btn btn-primary btn-sm',
+                customize: function ( win ) {
+                    // Optional: keep printed table compact and clean
+                    $(win.document.body).css('font-size', '12px').prepend(
+                        '<h3>Stock Inventory Report</h3><p>Printed: ' + new Date().toLocaleString() + '</p>'
+                    );
+                }
             }
         ]
     });
 
-    // Custom search function for stock filtering
-    $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
-        var category = $('#categoryFilter').val();
-        var stock = $('#stockFilter').val();
-        var expiry = $('#expiryFilter').val();
-        
-        // Category filter
-        if (category && data[3] !== category) {
-            return false;
-        }
-        
-        // Stock filter
-        if (stock) {
-            var stockValue = parseInt(data[6].replace(/[^\d]/g, ''));
-            if (stock === 'in-stock' && stockValue <= 10) {
-                return false;
-            } else if (stock === 'low-stock' && (stockValue === 0 || stockValue > 10)) {
-                return false;
-            } else if (stock === 'out-of-stock' && stockValue !== 0) {
+    // Helper: parse a date string (YYYY-MM-DD) into Date object ignoring timezone issues
+    function parseYMD(dateStr) {
+        if (!dateStr) return null;
+        // trim and use split to avoid Date parsing differences
+        var parts = dateStr.trim().split('-');
+        if (parts.length < 3) return null;
+        return new Date(parts[0], parts[1] - 1, parts[2]); // year, monthIndex, day
+    }
+
+    // Custom filter function using real values from the table rows
+    $.fn.dataTable.ext.search.push(function(settings, rowData, dataIndex) {
+        // Only apply to our table
+        if (settings.nTable.id !== 'stockTable') return true;
+
+        var categoryFilter = $('#categoryFilter').val(); // e.g. "tablet/capsule"
+        var stockFilter = $('#stockFilter').val();       // in-stock, low-stock, out-of-stock
+        var expiryFilter = $('#expiryFilter').val();     // expired, expiring-soon, valid
+
+        // columns indexes in your table:
+        // 0: ID, 1: Name, 2: Brand, 3: Batch, 4: Category, 5: Price, 6: Stock, 7: Mfg, 8: Exp Date, 9: Supplier, 10: Status
+
+        // Get raw values from the row DOM (safer than data array because badges may contain markup)
+        var rowNode = table.row(dataIndex).node();
+
+        // Category text (column 4)
+        var catText = $('td:eq(4)', rowNode).text().trim().toLowerCase();
+
+        // Stock numeric value (column 6) - remove non-numeric
+        var stockText = $('td:eq(6) span', rowNode).text().trim();
+        var stockValue = parseInt(stockText.replace(/[^\d-]/g, '')) || 0;
+
+        // Expiry date (column 8) as string (YYYY-MM-DD)
+        var expText = $('td:eq(8) span', rowNode).text().trim();
+        // Try parsing; if template prints as 'YYYY-MM-DD' this will work
+        var expDate = parseYMD(expText);
+
+        // ----- Category Filter -----
+        if (categoryFilter) {
+            // normalize both sides
+            if (catText !== categoryFilter.toLowerCase()) {
                 return false;
             }
         }
-        
-        // Expiry filter (simplified - just check for text color classes)
-        if (expiry) {
-            var expiryCell = data[8];
-            if (expiry === 'expired' && !expiryCell.includes('text-danger')) {
-                return false;
-            } else if (expiry === 'expiring-soon' && !expiryCell.includes('text-warning')) {
-                return false;
-            } else if (expiry === 'valid' && (expiryCell.includes('text-danger') || expiryCell.includes('text-warning'))) {
-                return false;
-            }
+
+        // ----- Stock Filter -----
+        if (stockFilter) {
+            if (stockFilter === 'in-stock' && stockValue <= 10) return false;
+            if (stockFilter === 'low-stock' && (stockValue === 0 || stockValue > 10)) return false;
+            if (stockFilter === 'out-of-stock' && stockValue !== 0) return false;
         }
-        
+
+        // ----- Expiry Filter -----
+        if (expiryFilter) {
+            var isExpired = false;
+            var isExpiringSoon = false;
+            var isValid = false;
+
+            if (expDate) {
+                // compare dates ignoring time
+                var exp = new Date(expDate.getFullYear(), expDate.getMonth(), expDate.getDate());
+                var td = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                var esd = new Date(expiringSoonDate.getFullYear(), expiringSoonDate.getMonth(), expiringSoonDate.getDate());
+
+                if (exp < td) {
+                    isExpired = true;
+                } else if (exp <= esd) {
+                    isExpiringSoon = true;
+                } else {
+                    isValid = true;
+                }
+            } else {
+                // if expiry not parseable, treat as valid (or change logic as needed)
+                isValid = true;
+            }
+
+            if (expiryFilter === 'expired' && !isExpired) return false;
+            if (expiryFilter === 'expiring-soon' && !isExpiringSoon) return false;
+            if (expiryFilter === 'valid' && !isValid) return false;
+        }
+
+        // passed all filters
         return true;
     });
 
-    // Filter functions
+    // Apply filters (redraw table)
     window.applyFilters = function() {
         table.draw();
     };
-    
-    // Real-time filtering
-    $('#categoryFilter').on('change', function() {
+
+    // Live apply on change
+    $('#categoryFilter, #stockFilter, #expiryFilter').on('change', function() {
         applyFilters();
     });
-    
-    $('#stockFilter').on('change', function() {
-        applyFilters();
-    });
-    
-    $('#expiryFilter').on('change', function() {
-        applyFilters();
-    });
+
+    // Optional: reset filters button (if present) - keeps UX
+    // $('#resetFiltersBtn').on('click', function() { $('#categoryFilter, #stockFilter, #expiryFilter').val(''); applyFilters(); });
+
+    // Ensure initial draw applies filters (if template preselects anything)
+    table.draw();
 });
 </script>
+
 {% endblock %}

@@ -7,6 +7,7 @@ class MedicineForm(forms.ModelForm):
         fields = [
             'name',
             'brand_name',
+            'batch_number',
             'category',
             'mfg_date',
             'exp_date',

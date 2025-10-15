@@ -28,9 +28,10 @@
                             {{ filter.form.name }}
                         </div>
                         <div class="col-md-3">
-                            <label for="id_brand_name" class="form-label">Brand</label>
-                            {{ filter.form.brand_name }}
+                            <label for="id_batch_number" class="form-label">Batch Number</label>
+                            {{ filter.form.batch_number }}
                         </div>
+                        
                         <div class="col-md-3">
                             <label for="id_category" class="form-label">Category</label>
                             {{ filter.form.category }}
@@ -92,6 +93,7 @@
                                     <th>ID</th>
                                     <th>Name</th>
                                     <th>Brand</th>
+                                    <th>Batch Number</th>
                                     <th>Category</th>
                                     <th>Price</th>
                                     <th>Stock</th>
@@ -111,6 +113,7 @@
                                         {% endif %}
                                     </td>
                                     <td>{{ medicine.brand_name|default:"N/A" }}</td>
+                                    <td>{{ medicine.batch_number|default:"N/A" }}</td>
                                     <td>{{ medicine.category }}</td>
                                     <td>NRS {{ medicine.price|floatformat:2 }}</td>
                                     <td>
