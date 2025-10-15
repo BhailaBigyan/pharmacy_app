@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Pharmacy Management System{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
-    
+
     <style>
         :root {
             --primary-blue: #2563eb;
@@ -41,7 +42,7 @@
             background-color: var(--white);
             border-bottom: 2px solid var(--border-color);
             padding: 1rem 0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .header-content {
@@ -145,12 +146,12 @@
             background-color: var(--white);
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             transition: box-shadow 0.3s ease;
         }
 
         .card:hover {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .card-header {
@@ -227,7 +228,7 @@
             background-color: var(--white);
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
         .table thead th {
@@ -301,7 +302,7 @@
             border-radius: 8px;
             padding: 1.5rem;
             text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
         .stat-number {
@@ -355,21 +356,25 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Header -->
     <header class="header">
         <div class="header-content">
-            <a href="{% url 'index' %}" class="logo">
+            <a href="" class="logo">
                 <i class="bi bi-hospital"></i>
                 Pharmacy Management
             </a>
             <div class="user-info">
                 {% if user.is_authenticated %}
-                    <span class="user-name">{{ user.get_full_name|default:user.username }}</span>
-                    <span class="user-role">{{ user.get_role_display|default:user.role|title }}</span>
-                    <a href="{% url 'logout' %}" class="btn btn-outline-primary btn-sm">
-                        <i class="bi bi-box-arrow-right"></i> Logout
-                    </a>
+                <span class="user-name">{{ user.get_full_name|default:user.username }}</span>
+                <a href="{% url 'notifications' %}" class="btn btn-outline-primary btn-sm" title="Notifications">
+                    <i class="bi bi-bell"></i>
+                </a>
+                <span class="user-role">{{ user.get_role_display|default:user.role|title }}</span>
+                <a href="{% url 'logout' %}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
                 {% endif %}
             </div>
         </div>
@@ -381,52 +386,54 @@
         <div class="nav">
             <ul class="nav-list">
                 {% if user.role == 'admin' %}
-                    <li class="nav-item">
-                        <a href="{% url 'index' %}" class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}">
-                            <i class="bi bi-speedometer2"></i> Admin Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'list_medicine' %}" class="nav-link">
-                            <i class="bi bi-capsule"></i> Medicines
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'stock_report' %}" class="nav-link">
-                            <i class="bi bi-box-seam"></i> Stock Report
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'list_supplier' %}" class="nav-link">
-                            <i class="bi bi-truck"></i> Suppliers
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'user_list' %}" class="nav-link">
-                            <i class="bi bi-people"></i> User Management
-                        </a>
-                    </li>
+                <li class="nav-item">
+                    <a href="{% url 'index' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}">
+                        <i class="bi bi-speedometer2"></i> Admin Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'list_medicine' %}" class="nav-link">
+                        <i class="bi bi-capsule"></i> Medicines
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'stock_report' %}" class="nav-link">
+                        <i class="bi bi-box-seam"></i> Stock Report
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'list_supplier' %}" class="nav-link">
+                        <i class="bi bi-truck"></i> Suppliers
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'user_list' %}" class="nav-link">
+                        <i class="bi bi-people"></i> User Management
+                    </a>
+                </li>
                 {% elif user.role == 'pharmacist' or user.role == 'staff' %}
-                    <li class="nav-item">
-                        <a href="{% url 'pharmacist_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'pharmacist_dashboard' %}active{% endif %}">
-                            <i class="bi bi-speedometer2"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'bill' %}" class="nav-link">
-                            <i class="bi bi-calculator"></i> Billing
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'sales_report' %}" class="nav-link">
-                            <i class="bi bi-graph-up"></i> Sales Report
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'pharmacist_medicine_list' %}" class="nav-link">
-                            <i class="bi bi-capsule"></i> Medicine Management
-                        </a>
-                    </li>
+                <li class="nav-item">
+                    <a href="{% url 'pharmacist_dashboard' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'pharmacist_dashboard' %}active{% endif %}">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'bill' %}" class="nav-link">
+                        <i class="bi bi-calculator"></i> Billing
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'sales_report' %}" class="nav-link">
+                        <i class="bi bi-graph-up"></i> Sales Report
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'pharmacist_medicine_list' %}" class="nav-link">
+                        <i class="bi bi-capsule"></i> Medicine Management
+                    </a>
+                </li>
                 {% endif %}
             </ul>
         </div>
@@ -436,12 +443,12 @@
     <!-- Main Content -->
     <main class="main-content">
         {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
         {% endif %}
 
         {% block content %}{% endblock %}
@@ -454,4 +461,5 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

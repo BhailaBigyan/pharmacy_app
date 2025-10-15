@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     # Pharmacist Medicine Management
+    
     path('medicine/list/', views.medicine_list, name='pharmacist_medicine_list'),
     path('medicine/detail/<int:medicine_id>/', views.medicine_detail, name='pharmacist_medicine_detail'),
     path('medicine/add/', views.medicine_add, name='pharmacist_medicine_add'),
