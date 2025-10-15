@@ -369,7 +369,7 @@
                 {% if user.is_authenticated %}
                     <span class="user-name">{{ user.get_full_name|default:user.username }}</span>
                
-                        <a href="{% url 'admin_notifications' %}" class="btn btn-outline-primary btn-sm" title="Notifications">
+                        <a href="{% url 'notifications' %}" class="btn btn-outline-primary btn-sm" title="Notifications">
                             <i class="bi bi-bell"></i> 
                         </a>
                     

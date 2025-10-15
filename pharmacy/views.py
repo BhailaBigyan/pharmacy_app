@@ -300,12 +300,27 @@ def pharmacist_dashboard(request):
     }
     return render(request, 'pharmacist/dashboard.html', context)
 
-@admin_required
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.conf import settings
+from datetime import datetime, timedelta
+from datetime import timedelta, datetime
+from django.utils import timezone
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.conf import settings
+from medicine.models import Medicine  # adjust to your app name
+
+
+
+
 def admin_notifications(request):
-    from datetime import timedelta
     today = timezone.now().date()
     three_days_from_now = today + timedelta(days=3)
 
+    # Query relevant data
     expiring_in_3_days = Medicine.objects.filter(
         exp_date__gt=today,
         exp_date__lte=three_days_from_now
@@ -326,30 +341,70 @@ def admin_notifications(request):
         'expired_list': expired_qs,
         'expired_count': expired_qs.count(),
     }
-    
-    # Send email when requested
+
+    # Email logic — only send if any alert exists
     if request.method == 'POST' and request.POST.get('action') == 'send_email':
-        from django.conf import settings
-        from django.template.loader import render_to_string
-        from django.core.mail import EmailMultiAlternatives
-        from datetime import datetime
-        subject = f'Pharmacy Notifications Summary - {datetime.now().strftime("%Y-%m-%d %H:%M")}'
         to_email = getattr(settings, 'ADMIN_EMAIL', None)
-        if to_email:
-            html_content = render_to_string('emails/notifications_summary.html', context)
-            text_content = f"Expiring in 3 days: {context['expiring_in_3_days_count']}, Low stock: {context['low_stock_count']}, Out of stock: {context['out_of_stock_count']}, Expired: {context['expired_count']}"
-            email = EmailMultiAlternatives(subject, text_content, settings.DEFAULT_FROM_EMAIL, [to_email])
-            email.attach_alternative(html_content, 'text/html')
-            try:
-                email.send(fail_silently=False)
-                messages.success(request, 'Notifications summary email sent to admin.')
-            except Exception as e:
-                messages.error(request, f'Failed to send email: {str(e)}')
-        else:
-            messages.error(request, 'Admin email is not configured. Set ADMIN_EMAIL in settings.')
+        if not to_email:
+            messages.error(request, 'Admin email not configured. Set ADMIN_EMAIL in settings.py.')
+            return redirect('admin_notifications')
+
+        # Include only conditions that are > 0
+        sections = []
+        if context['expired_count'] > 0:
+            sections.append('Expired Medicines')
+        if context['out_of_stock_count'] > 0:
+            sections.append('Out of Stock')
+        if context['low_stock_count'] > 0:
+            sections.append('Low Stock')
+        if context['expiring_in_3_days_count'] > 0:
+            sections.append('Expiring Soon')
+
+        # If nothing to report
+        if not sections:
+            messages.info(request, 'No active alerts to email.')
+            return redirect('admin_notifications')
+
+        subject = f"Pharmacy Inventory Alert - {', '.join(sections)} ({datetime.now().strftime('%Y-%m-%d %H:%M')})"
+
+        html_content = render_to_string('emails/notifications_summary.html', context)
+
+        # Build text version dynamically
+        text_parts = ["Dear Admin,", "", "Here is your pharmacy inventory alert summary:"]
+        if context['expired_count'] > 0:
+            text_parts.append(f"❌ Expired Medicines: {context['expired_count']}")
+        if context['out_of_stock_count'] > 0:
+            text_parts.append(f"🚫 Out of Stock: {context['out_of_stock_count']}")
+        if context['low_stock_count'] > 0:
+            text_parts.append(f"⚠️ Low Stock: {context['low_stock_count']}")
+        if context['expiring_in_3_days_count'] > 0:
+            text_parts.append(f"🧾 Expiring in 3 Days: {context['expiring_in_3_days_count']}")
+
+        text_parts.append("")
+        text_parts.append("Please review these items in the admin dashboard.")
+        text_parts.append("Best regards,")
+        text_parts.append("💊 Pharmacy Management System")
+
+        text_content = "\n".join(text_parts)
+
+        # Send email
+        email = EmailMultiAlternatives(
+            subject,
+            text_content,
+            settings.DEFAULT_FROM_EMAIL,
+            [to_email]
+        )
+        email.attach_alternative(html_content, 'text/html')
+
+        try:
+            email.send(fail_silently=False)
+            messages.success(request, f"Email sent successfully to {to_email}.")
+        except Exception as e:
+            messages.error(request, f"Failed to send email: {e}")
+
         return redirect('admin_notifications')
 
-    return render(request, 'admin/notifications.html', context)
+    return render(request, 'notifications.html', context)
 
 # For staff dashboard
 @staff_required
