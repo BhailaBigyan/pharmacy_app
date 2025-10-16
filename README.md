@@ -5,6 +5,8 @@ A web-based application to streamline and automate pharmacy operations. It helps
 ---
 
 ## Features
+- [@bhailabigyan](https://www.github.com/bhailabigyan)
+- [@sinkhwalsubash](https://www.github.com/sinkhwal07)
 
 - **Medicine Management:** Add, edit, delete, and view medicines. Track expiry and stock status.
 - **Supplier Management:** Manage supplier information.
