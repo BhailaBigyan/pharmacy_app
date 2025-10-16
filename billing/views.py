@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.db.models import Sum
 from django.utils.dateparse import parse_date
 from django.contrib.auth.decorators import login_required
+from pharmacy import admin
 from pharmacy.decorators import pharmacist_or_staff_required
 import json
 
@@ -33,6 +34,7 @@ def generate_invoice(request):
             subtotal = data.get("subtotal")
             tax = data.get("tax")
             total = data.get("total")
+            billed_by = request.user.username
             items = data.get("items", [])
 
             # Validate required fields
@@ -99,6 +101,8 @@ def generate_invoice(request):
                 subtotal=subtotal,
                 tax=tax,
                 total=total,
+                billed_by=billed_by,
+                created_at=timezone.now(),
             )
 
             # Create invoice items
@@ -190,15 +194,14 @@ def sales_report(request):
 # -------------------------------
 # Customer List & Detail
 # -------------------------------
-@pharmacist_or_staff_required
+@login_required
 def customer_list(request):
     customers = Customer.objects.all().order_by('-created_at')
     return render(request, 'pharmacist/billing/customer_list.html', {
         'customers': customers,
     })
 
-
-@pharmacist_or_staff_required
+@login_required
 def customer_detail(request, customer_id):
     customer = get_object_or_404(Customer, customer_id=customer_id)
     invoices = customer.invoices.all().order_by('-created_at')

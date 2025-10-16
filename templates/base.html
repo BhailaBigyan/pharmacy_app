@@ -354,6 +354,27 @@
             color: var(--gray);
             margin-top: 2rem;
         }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.3);
+                opacity: 0.6;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .btn .bg-danger {
+            animation: pulse 1.5s infinite;
+        }
     </style>
 </head>
 
@@ -361,16 +382,27 @@
     <!-- Header -->
     <header class="header">
         <div class="header-content">
-            <a href="" class="logo">
+            <a href="{% url 'index' %}" class="logo">
                 <i class="bi bi-hospital"></i>
                 Pharmacy Management
             </a>
+
             <div class="user-info">
+                <i class="bi bi-person-circle"></i>
                 {% if user.is_authenticated %}
                 <span class="user-name">{{ user.get_full_name|default:user.username }}</span>
-                <a href="{% url 'notifications' %}" class="btn btn-outline-primary btn-sm" title="Notifications">
+
+                <a href="{% url 'notifications' %}" class="btn btn-outline-primary btn-sm position-relative"
+                    title="Notifications">
                     <i class="bi bi-bell"></i>
+                    {% if total_notifications > 0 %}
+                    <span
+                        class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
+                        <span class="visually-hidden">New alerts</span>
+                    </span>
+                    {% endif %}
                 </a>
+
                 <span class="user-role">{{ user.get_role_display|default:user.role|title }}</span>
                 <a href="{% url 'logout' %}" class="btn btn-outline-primary btn-sm">
                     <i class="bi bi-box-arrow-right"></i> Logout
@@ -392,6 +424,7 @@
                         <i class="bi bi-speedometer2"></i> Admin Dashboard
                     </a>
                 </li>
+
                 <li class="nav-item">
                     <a href="{% url 'list_medicine' %}" class="nav-link">
                         <i class="bi bi-capsule"></i> Medicines
@@ -405,6 +438,11 @@
                 <li class="nav-item">
                     <a href="{% url 'list_supplier' %}" class="nav-link">
                         <i class="bi bi-truck"></i> Suppliers
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'customer_list' %}" class="nav-link">
+                        <i class="bi bi-person-lines-fill"></i> Customers
                     </a>
                 </li>
                 <li class="nav-item">

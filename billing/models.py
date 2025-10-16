@@ -28,9 +28,9 @@ class Invoice(models.Model):
     subtotal = models.DecimalField(max_digits=10, decimal_places=2)
     tax = models.DecimalField(max_digits=10, decimal_places=2)
     total = models.DecimalField(max_digits=10, decimal_places=2)
+    billed_by = models.CharField(max_length=100, blank=True)  # logged in user
     created_at = models.DateTimeField(auto_now_add=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
+    
     def __str__(self):
         return f"Invoice #{self.invoice_id} - {self.customer_name}"
 
