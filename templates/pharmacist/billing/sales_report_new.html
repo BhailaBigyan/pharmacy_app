@@ -20,12 +20,7 @@
                 <div class="stat-label">Total Sales</div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="stat-card">
-                <div class="stat-number text-info">NRS {{ total_tax|floatformat:2 }}</div>
-                <div class="stat-label">Total Tax</div>
-            </div>
-        </div>
+       
         <div class="col-md-4">
             <div class="stat-card">
                 <div class="stat-number text-primary">{{ invoices.count }}</div>
@@ -86,7 +81,7 @@
                                     <th>Customer</th>
                                     <th>Payment Method</th>
                                     <th>Subtotal</th>
-                                    <th>Tax</th>
+                                    <th>Discount</th>
                                     <th>Total</th>
                                     <th>Action</th>
                                 </tr>
@@ -99,7 +94,7 @@
                                     <td>{{ invoice.customer_name }}</td>
                                     <td>{{ invoice.payment_method|title }}</td>
                                     <td>NRS {{ invoice.subtotal|floatformat:2 }}</td>
-                                    <td>NRS {{ invoice.tax|floatformat:2 }}</td>
+                                    <td>NRS {{ invoice.discount|floatformat:2 }}</td>
                                     <td><strong>NRS {{ invoice.total|floatformat:2 }}</strong></td>
                                     <td>
                                         <a href="{% url 'invoice_detail' invoice.invoice_id %}"

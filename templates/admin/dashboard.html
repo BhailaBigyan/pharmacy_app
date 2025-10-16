@@ -1,4 +1,4 @@
-{% extends 'admin/base.html' %}
+{% extends 'base.html' %}
 {% block title %}Admin Dashboard - Admin Panel{% endblock %}
 
 {% block content %}
@@ -129,14 +129,8 @@
         <div class="col-12">
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-light d-flex align-items-center justify-content-between">
-                    <h5 class="mb-0"><i class="bi bi-bell"></i> Recent Notifications</h5>
-                    <form method="post" class="d-inline">
-                        {% csrf_token %}
-                        <input type="hidden" name="action" value="send_email">
-                        <button type="submit" class="btn btn-sm btn-outline-primary">
-                            <i class="bi bi-envelope"></i> Email Summary
-                        </button>
-                    </form>
+                    <h5 class="mb-0"><i class="bi bi-bell"></i> Alerts</h5>
+                  
                 </div>
                 <div class="card-body p-0">
                     {% if expiring_in_3_days or low_stock_list or out_of_stock_list or expired_list %}

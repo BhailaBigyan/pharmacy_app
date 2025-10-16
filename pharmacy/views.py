@@ -323,7 +323,7 @@ from medicine.models import Medicine  # adjust to your app name
 
 
 
-def admin_notifications(request):
+def notifications(request):
     today = timezone.now().date()
     three_days_from_now = today + timedelta(days=3)
 
@@ -409,7 +409,7 @@ def admin_notifications(request):
         except Exception as e:
             messages.error(request, f"Failed to send email: {e}")
 
-        return redirect('admin_notifications')
+        return redirect('notifications')
 
     return render(request, 'notifications.html', context)
 

@@ -42,7 +42,14 @@
             background-color: var(--white);
             border-bottom: 2px solid var(--border-color);
             padding: 1rem 0;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            
+            position: fixed;
+            /* Stick to top */
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1100;
+            /* Higher than nav */
         }
 
         .header-content {
@@ -93,6 +100,14 @@
         .nav-container {
             background-color: var(--white);
             border-bottom: 1px solid var(--border-color);
+
+            position: fixed;
+            /* Stick below header */
+            top: 72px;
+            /* Adjust based on header height */
+            left: 0;
+            width: 100%;
+            z-index: 1000;
         }
 
         .nav {
@@ -137,7 +152,8 @@
         .main-content {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 2rem 1rem;
+            padding: 170px 1rem 2rem;
+            /* top padding = header + nav height */
             min-height: calc(100vh - 200px);
         }
 
@@ -426,27 +442,27 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="{% url 'list_medicine' %}" class="nav-link">
+                    <a href="{% url 'list_medicine' %}" class="nav-link {% if request.resolver_match.url_name == 'list_medicine' %}active{% endif %}">
                         <i class="bi bi-capsule"></i> Medicines
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'stock_report' %}" class="nav-link">
+                    <a href="{% url 'stock_report' %}" class="nav-link {% if request.resolver_match.url_name == 'stock_report' %}active{% endif %}">
                         <i class="bi bi-box-seam"></i> Stock Report
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'list_supplier' %}" class="nav-link">
+                    <a href="{% url 'list_supplier' %}" class="nav-link {% if request.resolver_match.url_name == 'list_supplier' %}active{% endif %}">
                         <i class="bi bi-truck"></i> Suppliers
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'customer_list' %}" class="nav-link">
+                    <a href="{% url 'customer_list' %}" class="nav-link {% if request.resolver_match.url_name == 'customer_list' %}active{% endif %}">
                         <i class="bi bi-person-lines-fill"></i> Customers
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'user_list' %}" class="nav-link">
+                    <a href="{% url 'user_list' %}" class="nav-link {% if request.resolver_match.url_name == 'user_list' %}active{% endif %}">
                         <i class="bi bi-people"></i> User Management
                     </a>
                 </li>
@@ -458,18 +474,23 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'bill' %}" class="nav-link">
+                    <a href="{% url 'bill' %}" class="nav-link {% if request.resolver_match.url_name == 'bill' %}active{% endif %}">
                         <i class="bi bi-calculator"></i> Billing
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'sales_report' %}" class="nav-link">
+                    <a href="{% url 'sales_report' %}" class="nav-link {% if request.resolver_match.url_name == 'sales_report' %}active{% endif %}">
                         <i class="bi bi-graph-up"></i> Sales Report
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'pharmacist_medicine_list' %}" class="nav-link">
+                    <a href="{% url 'pharmacist_medicine_list' %}" class="nav-link {% if request.resolver_match.url_name == 'pharmacist_medicine_list' %}active{% endif %}">
                         <i class="bi bi-capsule"></i> Medicine Management
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'customer_list' %}" class="nav-link {% if request.resolver_match.url_name == 'customer_list' %}active{% endif %}">
+                        <i class="bi bi-person-lines-fill"></i> Customers
                     </a>
                 </li>
                 {% endif %}

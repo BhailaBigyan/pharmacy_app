@@ -1,4 +1,4 @@
-{% extends "admin/base.html" %}
+{% extends "base.html" %}
 {% block title %}Suppliers - Admin Panel{% endblock %}
 
 {% block content %}
@@ -22,6 +22,9 @@
                     </a>
                     <a href="{% url 'supplier_report' %}" class="btn btn-outline-primary">
                         <i class="bi bi-graph-up"></i> Supplier Report
+                    </a>
+                    <a href="{% url 'supplier_invoice' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-file-earmark-text"></i> New Supplier Invoice
                     </a>
                 </div>
                 <div>

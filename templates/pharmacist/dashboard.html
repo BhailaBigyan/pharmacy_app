@@ -154,86 +154,71 @@
     </div>
 </div>
 
-<!-- Hidden data for JavaScript -->
+<!-- Hidden JSON data -->
 <script type="application/json" id="sales-data">{{ sales_trend|safe }}</script>
 
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js" defer></script>
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
 <script>
-    // Wait for DOM to be ready and Chart.js to load
-    document.addEventListener('DOMContentLoaded', function() {
-        // Sales Trend Chart with optimized performance
-        const salesData = JSON.parse(document.getElementById('sales-data').textContent);
-        const ctx = document.getElementById('salesChart').getContext('2d');
-        
-        // Optimized chart configuration
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: salesData.map(item => item.date),
-                datasets: [{
-                    label: 'Daily Sales (NRS)',
-                    data: salesData.map(item => item.amount),
-                    borderColor: '#2563eb',
-                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.3,
-                    pointBackgroundColor: '#2563eb',
-                    pointBorderColor: '#ffffff',
-                    pointBorderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: {
-                    intersect: false,
-                    mode: 'index'
-                },
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(0,0,0,0.8)',
-                        titleColor: '#fff',
-                        bodyColor: '#fff',
-                        borderColor: '#2563eb',
-                        borderWidth: 1,
-                        cornerRadius: 8
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(0,0,0,0.1)',
-                            drawBorder: false
-                        },
-                        ticks: {
-                            callback: function(value) {
-                                return 'NRS ' + value.toLocaleString();
-                            }
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            maxTicksLimit: 7
+document.addEventListener('DOMContentLoaded', function() {
+    const rawData = document.getElementById('sales-data').textContent;
+    const salesData = JSON.parse(rawData);
+
+    const ctx = document.getElementById('salesChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: salesData.map(item => item.date),
+            datasets: [{
+                label: 'Daily Sales (NRS)',
+                data: salesData.map(item => item.amount),
+                borderColor: '#2563eb',
+                backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#2563eb',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'NRS ' + value.toLocaleString();
                         }
                     }
                 },
-                animation: {
-                    duration: 1000,
-                    easing: 'easeInOutQuart'
+                x: {
+                    grid: { display: false }
                 }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: '#2563eb',
+                    borderWidth: 1,
+                    cornerRadius: 8
+                }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeInOutQuart'
             }
-        });
+        }
     });
+});
 </script>
+
 {% endblock %}

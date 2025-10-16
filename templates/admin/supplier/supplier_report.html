@@ -1,4 +1,4 @@
-{% extends 'admin/base.html' %}
+{% extends 'base.html' %}
 {% block title %}Supplier Report - Admin{% endblock %}
 
 {% block content %}
@@ -28,6 +28,7 @@
               
                 <th>Price</th>
                 <th>Stock Qty</th>
+                <th>Total Amount</th>
                 <th>MFG Date</th>
                 <th>EXP Date</th>
                 <th>Supplier</th>
@@ -41,12 +42,10 @@
                
                 <td>{{ med.price }}</td>
                 <td>
-                    {% if med.stock_qty <= 0 %}
-                        <span class="badge bg-danger">Out of Stock</span>
-                    {% else %}
                         {{ med.stock_qty }}
-                    {% endif %}
+                   
                 </td>
+                <td>{{ med.total_value }}</td>
                 <td>{{ med.mfg_date }}</td>
                 <td>
                     {% if med.exp_date < today %}
