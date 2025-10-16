@@ -20,7 +20,6 @@ class Medicine(models.Model):
     
     price = models.DecimalField(max_digits=10, decimal_places=2)
     stock_qty = models.PositiveIntegerField(default=0)
-    
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name="medicines")
 
     def __str__(self):

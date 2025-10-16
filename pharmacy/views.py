@@ -132,6 +132,7 @@ def test_forgot_password(request):
     return render(request, 'test_forgot_password.html')
 
 
+from medicine.models import Medicine
 @admin_required
 def index(request):
     # Redirect based on user role
@@ -139,11 +140,16 @@ def index(request):
         from datetime import timedelta
 
         total_medicines = Medicine.objects.count()
+        expiring_in_3_days = Medicine.objects.filter(
+            exp_date__gt=timezone.now().date(),
+        ).count()
+        low_stock = Medicine.objects.filter(stock_qty__lte=10, stock_qty__gt=0).count()
         out_of_stock = Medicine.objects.filter(stock_qty__lte=0).count()
         expired_medicines = Medicine.objects.filter(exp_date__lt=timezone.now().date()).count()
 
         today = timezone.now().date()
         three_days_from_now = today + timedelta(days=3)
+        total_notifications = expiring_in_3_days + low_stock + out_of_stock + expired_medicines
 
         # Medicines expiring within next 3 days (but not already expired)
         expiring_in_3_days = Medicine.objects.filter(
@@ -162,6 +168,7 @@ def index(request):
             'expiring_in_3_days_list': expiring_in_3_days[:5],  # show first 5
             'low_stock_count': low_stock_qs.count(),
             'low_stock_list': low_stock_qs[:5],  # show first 5
+            'total_notifications': total_notifications,
         }
         return render(request, 'admin/dashboard.html', context)
     elif request.user.role == 'pharmacist':
@@ -316,7 +323,7 @@ from medicine.models import Medicine  # adjust to your app name
 
 
 
-def admin_notifications(request):
+def notifications(request):
     today = timezone.now().date()
     three_days_from_now = today + timedelta(days=3)
 
@@ -402,7 +409,7 @@ def admin_notifications(request):
         except Exception as e:
             messages.error(request, f"Failed to send email: {e}")
 
-        return redirect('admin_notifications')
+        return redirect('notifications')
 
     return render(request, 'notifications.html', context)
 

@@ -11,14 +11,14 @@
         justify-content: space-between;
         align-items: center;
         transition: all 0.2s ease;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
 
     .medicine-item:hover {
         background-color: var(--light-gray);
         border-color: var(--primary-blue);
         transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(37,99,235,0.1);
+        box-shadow: 0 4px 8px rgba(37, 99, 235, 0.1);
     }
 
     .add-btn {
@@ -42,7 +42,7 @@
         border: 1px solid var(--border-color);
         border-radius: 8px;
         padding: 1.5rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
 
     .medicine-section {
@@ -50,7 +50,7 @@
         border: 1px solid var(--border-color);
         border-radius: 8px;
         padding: 1.5rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
 
     .table {
@@ -65,16 +65,18 @@
         font-weight: 600;
     }
 
-    .form-control, .form-select {
+    .form-control,
+    .form-select {
         border: 1px solid var(--border-color);
         border-radius: 6px;
         padding: 0.75rem;
         transition: all 0.2s ease;
     }
 
-    .form-control:focus, .form-select:focus {
+    .form-control:focus,
+    .form-select:focus {
         border-color: var(--primary-blue);
-        box-shadow: 0 0 0 0.2rem rgba(37,99,235,0.25);
+        box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
     }
 
     .btn-primary {
@@ -89,7 +91,7 @@
     .btn-primary:hover {
         background: var(--dark-blue);
         transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(37,99,235,0.3);
+        box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
     }
 
     .btn-sm {
@@ -125,7 +127,7 @@
 
     .search-input:focus {
         border-color: var(--primary-blue);
-        box-shadow: 0 0 0 0.2rem rgba(37,99,235,0.25);
+        box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
     }
 
     .section-title {
@@ -166,7 +168,7 @@
         background: var(--white);
         border-radius: 12px;
         border: 1px solid var(--border-color);
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
 
     .medicine-name {
@@ -210,7 +212,7 @@
         margin-bottom: 0.5rem;
     }
 </style>
-
+<!-- 
 <div class="row mb-4">
     <div class="col-12">
         <h1 class="mb-3">
@@ -218,7 +220,7 @@
         </h1>
         <p class="text-muted">Select medicines and generate invoices</p>
     </div>
-</div>
+</div> -->
 
 <div class="container-fluid">
     <div class="row">
@@ -229,7 +231,8 @@
                     <i class="bi bi-capsule"></i> Select Medicines
                 </h4>
                 <div class="search-container">
-                    <input type="text" id="search" class="form-control search-input mb-3" placeholder=" Search medicines...">
+                    <input type="text" id="search" class="form-control search-input mb-3"
+                        placeholder=" Search medicines...">
                 </div>
 
                 {% for medicine in medicines %}
@@ -253,7 +256,7 @@
                 <h4 class="mb-3">
                     <i class="bi bi-cart-check"></i> Current Bill
                 </h4>
-                
+
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label class="form-label fw-bold">Customer Name *</label>
@@ -262,6 +265,10 @@
                     <div class="col-md-6">
                         <label class="form-label fw-bold">Phone Number</label>
                         <input type="text" id="phoneNumber" class="form-control" placeholder="Optional">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Email</label>
+                        <input type="text" id="email" class="form-control" placeholder="Optional">
                     </div>
                 </div>
 
@@ -285,16 +292,18 @@
                     <div class="row">
                         <div class="col-6">
                             <p class="mb-2"><strong>Subtotal:</strong></p>
-                            <p class="mb-2"><strong>Tax (13%):</strong></p>
+                            <p class="mb-2"><strong>Discount (NRS):</strong></p>
                             <h5 class="mb-0"><strong>Total:</strong></h5>
                         </div>
                         <div class="col-6 text-end">
                             <p class="mb-2" id="subtotal">NRS 0.00</p>
-                            <p class="mb-2" id="tax">NRS 0.00</p>
+                            <input type="number" id="discount" class="form-control text-end mb-2" value="0" min="0"
+                                step="0.01" style="max-width: 120px; display:inline-block;">
                             <h5 class="mb-0" id="total">NRS 0.00</h5>
                         </div>
                     </div>
                 </div>
+
 
                 <div class="mt-4">
                     <label class="form-label fw-bold">Payment Method</label>
@@ -311,7 +320,8 @@
                     <div class="row">
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Amount Received</label>
-                            <input type="number" id="amountReceived" class="form-control" placeholder="Enter amount received">
+                            <input type="number" id="amountReceived" class="form-control"
+                                placeholder="Enter amount received">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Return Amount</label>
@@ -342,6 +352,11 @@
         const generateBtn = document.querySelector("#generateInvoiceBtn");
 
         let cart = [];
+        const discountInput = document.querySelector("#discount");
+        if (discountInput) {
+            discountInput.addEventListener("input", updateCart);
+        }
+
 
         function updateCart() {
             cartTableBody.innerHTML = "";
@@ -350,11 +365,11 @@
             if (cart.length === 0) {
                 const row = document.createElement("tr");
                 row.innerHTML = `
-                    <td colspan="6" class="cart-empty">
-                        <i class="bi bi-cart-x"></i><br>
-                        No items in cart
-                    </td>
-                `;
+            <td colspan="6" class="cart-empty">
+                <i class="bi bi-cart-x"></i><br>
+                No items in cart
+            </td>
+        `;
                 cartTableBody.appendChild(row);
             } else {
                 cart.forEach((item, index) => {
@@ -363,29 +378,29 @@
 
                     const row = document.createElement("tr");
                     row.innerHTML = `
-                      <td>${index + 1}</td>
-                      <td class="text-start">${item.name}</td>
-                      <td>
-                        <div class="quantity-controls">
-                            <button class="btn btn-sm btn-outline-secondary decrease" data-index="${index}">-</button>
-                            <span class="quantity-display">${item.qty}</span>
-                            <button class="btn btn-sm btn-outline-secondary increase" data-index="${index}">+</button>
-                        </div>
-                      </td>
-                      <td>NRS ${item.price.toFixed(2)}</td>
-                      <td class="fw-bold">NRS ${itemTotal.toFixed(2)}</td>
-                      <td><button class="btn btn-sm btn-danger remove" data-index="${index}">×</button></td>
-                    `;
+              <td>${index + 1}</td>
+              <td class="text-start">${item.name}</td>
+              <td>
+                <div class="quantity-controls">
+                    <button class="btn btn-sm btn-outline-secondary decrease" data-index="${index}">-</button>
+                    <span class="quantity-display">${item.qty}</span>
+                    <button class="btn btn-sm btn-outline-secondary increase" data-index="${index}">+</button>
+                </div>
+              </td>
+              <td>NRS ${item.price.toFixed(2)}</td>
+              <td class="fw-bold">NRS ${itemTotal.toFixed(2)}</td>
+              <td><button class="btn btn-sm btn-danger remove" data-index="${index}">×</button></td>
+            `;
                     cartTableBody.appendChild(row);
                 });
             }
 
-            const tax = subtotal * 0.13;
-            const total = subtotal + tax;
+            const discountInput = document.querySelector("#discount");
+            const discount = parseFloat(discountInput?.value || 0);
+            const total = subtotal - discount;
 
             subtotalEl.textContent = `NRS ${subtotal.toFixed(2)}`;
-            taxEl.textContent = `NRS ${tax.toFixed(2)}`;
-            totalEl.textContent = `NRS ${total.toFixed(2)}`;
+            totalEl.textContent = `NRS ${Math.max(total, 0).toFixed(2)}`;
 
             if (paymentMethod && paymentMethod.value === "cash" && amountReceived && amountReceived.value) {
                 const received = parseFloat(amountReceived.value);
@@ -438,10 +453,10 @@
         // Search functionality
         const searchInput = document.querySelector("#search");
         if (searchInput) {
-            searchInput.addEventListener("input", function() {
+            searchInput.addEventListener("input", function () {
                 const searchTerm = this.value.toLowerCase();
                 const medicineItems = document.querySelectorAll(".medicine-item");
-                
+
                 medicineItems.forEach(item => {
                     const medicineName = item.querySelector(".medicine-name").textContent.toLowerCase();
                     if (medicineName.includes(searchTerm)) {
@@ -459,7 +474,7 @@
             const phoneNumberEl = document.querySelector("#phoneNumber");
             const amountReceivedEl = document.querySelector("#amountReceived");
             const returnAmountEl = document.querySelector("#returnAmount");
-            
+
             const customerName = customerNameEl ? customerNameEl.value.trim() : "";
             const phoneNumber = phoneNumberEl ? phoneNumberEl.value.trim() : "";
             const method = paymentMethod ? paymentMethod.value : "";
@@ -473,7 +488,7 @@
                 alert("Please fill customer name, select payment method, and add items.");
                 return;
             }
-            
+
             // Prepare data for sending
             const invoiceData = {
                 customerName,
@@ -486,9 +501,9 @@
                 total,
                 items: cart
             };
-            
+
             console.log("Sending invoice data:", invoiceData);
-            
+
             try {
                 const response = await fetch("/billing/generate-invoice/", {
                     method: "POST",
@@ -501,7 +516,7 @@
 
                 const data = await response.json();
                 console.log("Response:", data);
-                
+
                 if (response.ok && data.invoice_id) {
                     // Redirect to invoice detail page
                     window.location.href = `/billing/invoice/${data.invoice_id}/`;

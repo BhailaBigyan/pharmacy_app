@@ -1,53 +1,144 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <meta charset="UTF-8">
+  <title>Pharmacy Notifications Summary</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      color: #333;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 700px;
+      margin: 20px auto;
+      background-color: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #004080;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    p.date {
+      text-align: center;
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    h3 {
+      color: #004080;
+      border-bottom: 2px solid #004080;
+      padding-bottom: 5px;
+      margin-top: 25px;
+      margin-bottom: 10px;
+    }
+
+    ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0 0 20px 0;
+    }
+
+    li {
+      padding: 8px 12px;
+      border-bottom: 1px solid #eee;
+      font-size: 14px;
+    }
+
+    li:last-child {
+      border-bottom: none;
+    }
+
+    .no-items {
+      font-style: italic;
+      color: #999;
+      padding-left: 12px;
+    }
+
+    .section {
+      margin-bottom: 20px;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #999;
+      margin-top: 30px;
+      border-top: 1px solid #ddd;
+      padding-top: 10px;
+    }
+  </style>
+</head>
 <body>
-  <h2>Pharmacy Notifications Summary</h2>
-  <p>Date: {{ today|date:"Y-m-d" }}</p>
+  <div class="container">
+    <h2>Pharmacy Notifications Summary</h2>
+    <p class="date">Date: {{ today|date:"Y-m-d" }}</p>
 
-  <h3>Expiring within 3 days ({{ expiring_in_3_days_count }})</h3>
-  {% if expiring_in_3_days_count %}
-  <ul>
-    {% for med in expiring_in_3_days %}
-    <li>{{ med.name }}{% if med.brand_name %} ({{ med.brand_name }}){% endif %} - {{ med.exp_date|date:"Y-m-d" }}</li>
-    {% endfor %}
-  </ul>
-  {% else %}
-  <p>No medicines expiring in the next 3 days.</p>
-  {% endif %}
+    <div class="section">
+      <h3>Expiring within 3 days ({{ expiring_in_3_days_count }})</h3>
+      {% if expiring_in_3_days_count %}
+      <ul>
+        {% for med in expiring_in_3_days %}
+        <li>{{ med.name }}{% if med.brand_name %} ({{ med.brand_name }}){% endif %} - {{ med.exp_date|date:"Y-m-d" }}</li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="no-items">No medicines expiring in the next 3 days.</p>
+      {% endif %}
+    </div>
 
-  <h3>Low stock ({{ low_stock_count }})</h3>
-  {% if low_stock_count %}
-  <ul>
-    {% for med in low_stock_list %}
-    <li>{{ med.name }}{% if med.brand_name %} ({{ med.brand_name }}){% endif %} - Stock: {{ med.stock_qty }}</li>
-    {% endfor %}
-  </ul>
-  {% else %}
-  <p>No low stock items.</p>
-  {% endif %}
+    <div class="section">
+      <h3>Low Stock ({{ low_stock_count }})</h3>
+      {% if low_stock_count %}
+      <ul>
+        {% for med in low_stock_list %}
+        <li>{{ med.name }}{% if med.brand_name %} ({{ med.brand_name }}){% endif %} - Stock: {{ med.stock_qty }}</li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="no-items">No low stock items.</p>
+      {% endif %}
+    </div>
 
-  <h3>Out of stock ({{ out_of_stock_count }})</h3>
-  {% if out_of_stock_count %}
-  <ul>
-    {% for med in out_of_stock_list %}
-    <li>{{ med.name }}{% if med.brand_name %} ({{ med.brand_name }}){% endif %}</li>
-    {% endfor %}
-  </ul>
-  {% else %}
-  <p>No out of stock items.</p>
-  {% endif %}
+    <div class="section">
+      <h3>Out of Stock ({{ out_of_stock_count }})</h3>
+      {% if out_of_stock_count %}
+      <ul>
+        {% for med in out_of_stock_list %}
+        <li>{{ med.name }}{% if med.brand_name %} ({{ med.brand_name }}){% endif %}</li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="no-items">No out of stock items.</p>
+      {% endif %}
+    </div>
 
-  <h3>Already expired ({{ expired_count }})</h3>
-  {% if expired_count %}
-  <ul>
-    {% for med in expired_list %}
-    <li>{{ med.name }}{% if med.brand_name %} ({{ med.brand_name }}){% endif %} - {{ med.exp_date|date:"Y-m-d" }}</li>
-    {% endfor %}
-  </ul>
-  {% else %}
-  <p>No expired medicines.</p>
-  {% endif %}
+    <div class="section">
+      <h3>Already Expired ({{ expired_count }})</h3>
+      {% if expired_count %}
+      <ul>
+        {% for med in expired_list %}
+        <li>{{ med.name }}{% if med.brand_name %} ({{ med.brand_name }}){% endif %} - {{ med.exp_date|date:"Y-m-d" }}</li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="no-items">No expired medicines.</p>
+      {% endif %}
+    </div>
 
+    <div class="footer">
+      &copy; {{ today|date:"Y" }} Pharmacy Management System. All rights reserved.
+    </div>
+  </div>
 </body>
 </html>
-

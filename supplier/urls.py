@@ -8,4 +8,6 @@ urlpatterns = [
     path('delete_supplier/<int:supplier_id>/', views.delete_supplier, name='delete_supplier'),
     path('list_supplier/', views.list_supplier, name='list_supplier'),
     path('supplier_report/', views.supplier_report, name='supplier_report'),
+    path('supplier_invoice/', views.supplier_invoice_entry, name='supplier_invoice'),
+    path('create_supplier_invoice/', views.create_supplier_invoice, name='create_supplier_invoice'),
 ]

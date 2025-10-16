@@ -7,7 +7,7 @@ from . import debug_views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('notifications/', views.admin_notifications, name='notifications'),
+    path('notifications/', views.notifications, name='notifications'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path("register/", views.register_view, name="register"),

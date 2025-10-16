@@ -41,3 +41,12 @@ def pharmacist_or_staff_required(view_func):
 def admin_or_pharmacist_required(view_func):
     """Decorator to require admin or pharmacist role"""
     return role_required(['admin', 'pharmacist'])(view_func)
+
+def transaction_atomic(view_func):
+    """Decorator to wrap view in a database transaction"""
+    from django.db import transaction
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        with transaction.atomic():
+            return view_func(request, *args, **kwargs)
+    return wrapper
