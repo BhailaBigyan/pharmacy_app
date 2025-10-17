@@ -53,6 +53,11 @@ pharmacy_app/
 
 ---
 
+## Default Admin
+   admin_username = "admin"
+   admin_password = "Admin@123"
+
+---
 ## User Roles
 
 - **Admin:** Full access, including user management.

@@ -10,4 +10,5 @@ urlpatterns = [
     path('supplier_report/', views.supplier_report, name='supplier_report'),
     path('supplier_invoice/', views.supplier_invoice_entry, name='supplier_invoice'),
     path('create_supplier_invoice/', views.create_supplier_invoice, name='create_supplier_invoice'),
+    path('view_supplier_invoice/<int:invoice_id>/', views.view_supplier_invoice, name='view_supplier_invoice'),
 ]
