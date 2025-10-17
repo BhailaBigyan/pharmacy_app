@@ -82,7 +82,9 @@ python manage.py test
 ---
 
 ## For any Database Related Error
-```For reboot database
+
+-For restarting new database
+```bash
 del pharmacy\migrations\0*.py
 del billing\migrations\0*.py
 del supplier\migrations\0*.py
