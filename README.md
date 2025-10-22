@@ -53,6 +53,11 @@ pharmacy_app/
 
 ---
 
+## Default Admin
+   admin_username = "admin"
+   admin_password = "Admin@123"
+
+---
 ## User Roles
 
 - **Admin:** Full access, including user management.
@@ -81,6 +86,17 @@ python manage.py test
 
 ---
 
+## For any Database Related Error
+
+-For restarting new database
+```bash
+del pharmacy\migrations\0*.py
+del billing\migrations\0*.py
+del supplier\migrations\0*.py
+del medicine\migrations\0*.py
+python manage.py makemigrations
+python manage.py migrate
+```
 ## Authors
 
 - [@bhailabigyan](https://www.github.com/bhailabigyan)
