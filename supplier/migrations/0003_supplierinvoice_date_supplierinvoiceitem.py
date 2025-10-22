@@ -8,8 +8,8 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('medicine', '0004_medicine_batch_number'),
-        ('supplier', '0002_supplierinvoice'),
+        ('medicine', '0001_initial'),
+        ('supplier', '0002_alter_supplierinvoice_date_supplierinvoiceitem'),
     ]
 
     operations = [
