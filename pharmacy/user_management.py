@@ -47,24 +47,32 @@ def user_add(request):
         'form': form,
     })
 
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect, render
+from .forms import UserEditForm
 @admin_required
+
 def user_edit(request, user_id):
     """Edit user for admin"""
     user = get_object_or_404(User, id=user_id)
-    
+
     if request.method == "POST":
         form = UserEditForm(request.POST, instance=user)
         if form.is_valid():
+            password = form.cleaned_data.get('password')
+            if password and password != '********':
+                user.set_password(password)
             form.save()
             messages.success(request, 'User updated successfully!')
             return redirect('user_detail', user_id=user.id)
     else:
         form = UserEditForm(instance=user)
-    
+
     return render(request, 'admin/users/user_edit.html', {
         'form': form,
         'user_obj': user,
     })
+
 
 @admin_required
 def user_delete(request, user_id):

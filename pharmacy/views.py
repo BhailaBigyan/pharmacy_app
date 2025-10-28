@@ -66,23 +66,38 @@ def logout_view(request):
     logout(request)
     return redirect('login')
 
-# Forgot Password Views
+
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
+from django.core.mail import send_mail
+from django.conf import settings
+
 def forgot_password(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         try:
             user = User.objects.get(email=email)
+            
             # Generate reset token
             reset_token = ''.join(random.choices(string.ascii_letters + string.digits, k=32))
             user.reset_token = reset_token
             user.save()
             
-            # For testing purposes, we'll show the reset link instead of sending email
+            # Build reset URL
             reset_url = request.build_absolute_uri(f'/reset-password/{reset_token}/')
             
-            messages.success(request, f'Password reset link generated! For testing: {reset_url}')
-            return redirect('forgot_password')
+            # Send email
+            subject = 'Password Reset Request'
+            message = f'Hi {user.username},\n\nYou requested a password reset. Click the link below to reset your password:\n\n{reset_url}\n\nIf you did not request this, please ignore this email.'
+            from_email = settings.DEFAULT_FROM_EMAIL
+            recipient_list = [email]
             
+            send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+            
+            messages.success(request, 'Password reset link has been sent to your email.')
+            return redirect('forgot_password')
+        
         except User.DoesNotExist:
             messages.error(request, 'No account found with this email address.')
     
@@ -109,27 +124,6 @@ def reset_password(request, token):
     
     return render(request, 'reset_password.html', {'token': token})
 
-def test_forgot_password(request):
-    """Test view for forgot password functionality"""
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        try:
-            user = User.objects.get(email=email)
-            # Generate reset token
-            reset_token = ''.join(random.choices(string.ascii_letters + string.digits, k=32))
-            user.reset_token = reset_token
-            user.save()
-            
-            # For testing purposes, we'll show the reset link instead of sending email
-            reset_url = request.build_absolute_uri(f'/reset-password/{reset_token}/')
-            
-            messages.success(request, f'Password reset link generated! For testing: {reset_url}')
-            return redirect('test_forgot_password')
-            
-        except User.DoesNotExist:
-            messages.error(request, 'No account found with this email address.')
-    
-    return render(request, 'test_forgot_password.html')
 
 
 from medicine.models import Medicine
@@ -202,8 +196,6 @@ def stock_report(request):
     })
 
 
-from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm
 
 # def register_view(request):
     # if request.method == "POST":

@@ -28,14 +28,14 @@
                                 <label for="{{ form.username.id_for_label }}" class="form-label">Username *</label>
                                 {{ form.username }}
                                 {% if form.username.errors %}
-                                    <div class="text-danger small">{{ form.username.errors.0 }}</div>
+                                <div class="text-danger small">{{ form.username.errors.0 }}</div>
                                 {% endif %}
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="{{ form.email.id_for_label }}" class="form-label">Email *</label>
                                 {{ form.email }}
                                 {% if form.email.errors %}
-                                    <div class="text-danger small">{{ form.email.errors.0 }}</div>
+                                <div class="text-danger small">{{ form.email.errors.0 }}</div>
                                 {% endif %}
                             </div>
                         </div>
@@ -45,14 +45,14 @@
                                 <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name *</label>
                                 {{ form.first_name }}
                                 {% if form.first_name.errors %}
-                                    <div class="text-danger small">{{ form.first_name.errors.0 }}</div>
+                                <div class="text-danger small">{{ form.first_name.errors.0 }}</div>
                                 {% endif %}
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name *</label>
                                 {{ form.last_name }}
                                 {% if form.last_name.errors %}
-                                    <div class="text-danger small">{{ form.last_name.errors.0 }}</div>
+                                <div class="text-danger small">{{ form.last_name.errors.0 }}</div>
                                 {% endif %}
                             </div>
                         </div>
@@ -62,7 +62,7 @@
                                 <label for="{{ form.role.id_for_label }}" class="form-label">Role *</label>
                                 {{ form.role }}
                                 {% if form.role.errors %}
-                                    <div class="text-danger small">{{ form.role.errors.0 }}</div>
+                                <div class="text-danger small">{{ form.role.errors.0 }}</div>
                                 {% endif %}
                             </div>
                             <div class="col-md-6 mb-3">
@@ -73,11 +73,21 @@
                                     </label>
                                 </div>
                                 {% if form.is_active.errors %}
-                                    <div class="text-danger small">{{ form.is_active.errors.0 }}</div>
+                                <div class="text-danger small">{{ form.is_active.errors.0 }}</div>
                                 {% endif %}
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.password.id_for_label }}" class="form-label">Password</label>
+                                {{ form.password }}
+                                {% if form.password.errors %}
+                                <div class="text-danger small">{{ form.password.errors.0 }}</div>
+                                {% endif %}
+                                <small class="text-muted">Leave blank to keep current password</small>
+                            </div>
 
+                        </div>
                         <div class="d-flex gap-2 mt-4">
                             <button type="submit" class="btn btn-success">
                                 <i class="bi bi-check"></i> Update User
@@ -106,25 +116,26 @@
                         <strong>User ID:</strong> {{ user_obj.id }}
                     </div>
                     <div class="mb-3">
-                        <strong>Current Role:</strong> 
-                        <span class="badge {% if user_obj.role == 'admin' %}bg-danger{% elif user_obj.role == 'pharmacist' %}bg-primary{% else %}bg-info{% endif %}">
+                        <strong>Current Role:</strong>
+                        <span
+                            class="badge {% if user_obj.role == 'admin' %}bg-danger{% elif user_obj.role == 'pharmacist' %}bg-primary{% else %}bg-info{% endif %}">
                             {{ user_obj.get_role_display }}
                         </span>
                     </div>
                     <div class="mb-3">
-                        <strong>Status:</strong> 
+                        <strong>Status:</strong>
                         {% if user_obj.is_active %}
-                            <span class="badge bg-success">Active</span>
+                        <span class="badge bg-success">Active</span>
                         {% else %}
-                            <span class="badge bg-secondary">Inactive</span>
+                        <span class="badge bg-secondary">Inactive</span>
                         {% endif %}
                     </div>
                     <div class="mb-3">
-                        <strong>Last Login:</strong> 
+                        <strong>Last Login:</strong>
                         {% if user_obj.last_login %}
-                            {{ user_obj.last_login|date:"Y-m-d H:i" }}
+                        {{ user_obj.last_login|date:"Y-m-d H:i" }}
                         {% else %}
-                            <span class="text-muted">Never</span>
+                        <span class="text-muted">Never</span>
                         {% endif %}
                     </div>
                     <div class="mb-3">

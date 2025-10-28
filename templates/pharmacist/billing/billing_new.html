@@ -343,7 +343,7 @@
         const addButtons = document.querySelectorAll(".add-btn");
         const cartTableBody = document.querySelector("#cart-items");
         const subtotalEl = document.querySelector("#subtotal");
-        const taxEl = document.querySelector("#tax");
+        const discountEl = document.querySelector("#discount");
         const totalEl = document.querySelector("#total");
         const paymentMethod = document.querySelector("#paymentMethod");
         const cashFields = document.querySelector("#cashFields");
@@ -481,7 +481,7 @@
             const received = amountReceivedEl ? amountReceivedEl.value.trim() : "";
             const returned = returnAmountEl ? returnAmountEl.value.trim() : "";
             const subtotal = parseFloat(subtotalEl.textContent.replace("NRS ", ""));
-            const tax = parseFloat(taxEl.textContent.replace("NRS ", ""));
+            const discount = parseFloat(discountEl.textContent.replace("NRS ", ""));
             const total = parseFloat(totalEl.textContent.replace("NRS ", ""));
 
             if (!customerName || !method || cart.length === 0) {
@@ -497,7 +497,7 @@
                 amountReceived: received || null,
                 returnAmount: returned || null,
                 subtotal,
-                tax,
+                discount,
                 total,
                 items: cart
             };
