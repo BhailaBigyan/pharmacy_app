@@ -14,7 +14,7 @@ SECRET_KEY = 'django-insecure-linfk6dl#^npscg$gt^70^xi9nx8e4duj=hp+@q2!38ouw84)%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', 'https://pharmacy-app-ss3c.onrender.com']
 
 
 
