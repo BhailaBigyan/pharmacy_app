@@ -1,553 +1,370 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
-<style>
-    .medicine-item {
-        background-color: var(--white);
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        padding: 1rem;
-        margin-bottom: 0.75rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
 
-    .medicine-item:hover {
-        background-color: var(--light-gray);
-        border-color: var(--primary-blue);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(37, 99, 235, 0.1);
-    }
+<link rel="stylesheet" href="{% static 'billing_style.css' %}">
 
-    .add-btn {
-        width: 35px;
-        height: 35px;
-        border-radius: 50%;
-        background: var(--primary-blue);
-        border: none;
-        color: var(--white);
-        font-weight: bold;
-        transition: all 0.2s ease;
-    }
-
-    .add-btn:hover {
-        background: var(--dark-blue);
-        transform: scale(1.05);
-    }
-
-    .billing-card {
-        background-color: var(--white);
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        padding: 1.5rem;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-
-    .medicine-section {
-        background-color: var(--white);
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        padding: 1.5rem;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-
-    .table {
-        border-radius: 8px;
-        overflow: hidden;
-    }
-
-    .table thead th {
-        background: var(--primary-blue);
-        color: var(--white);
-        border: none;
-        font-weight: 600;
-    }
-
-    .form-control,
-    .form-select {
-        border: 1px solid var(--border-color);
-        border-radius: 6px;
-        padding: 0.75rem;
-        transition: all 0.2s ease;
-    }
-
-    .form-control:focus,
-    .form-select:focus {
-        border-color: var(--primary-blue);
-        box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
-    }
-
-    .btn-primary {
-        background: var(--primary-blue);
-        border: none;
-        padding: 0.75rem 1.5rem;
-        border-radius: 6px;
-        font-weight: 600;
-        transition: all 0.2s ease;
-    }
-
-    .btn-primary:hover {
-        background: var(--dark-blue);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
-    }
-
-    .btn-sm {
-        border-radius: 4px;
-        padding: 0.25rem 0.5rem;
-    }
-
-    .btn-outline-secondary {
-        border-color: var(--primary-blue);
-        color: var(--primary-blue);
-    }
-
-    .btn-outline-secondary:hover {
-        background: var(--primary-blue);
-        border-color: var(--primary-blue);
-    }
-
-    .btn-danger {
-        background: var(--danger);
-        border: none;
-    }
-
-    .btn-danger:hover {
-        background: #dc2626;
-    }
-
-    .search-input {
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        padding: 0.75rem;
-        transition: all 0.2s ease;
-    }
-
-    .search-input:focus {
-        border-color: var(--primary-blue);
-        box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
-    }
-
-    .section-title {
-        color: var(--dark-blue);
-        font-weight: 700;
-        margin-bottom: 1.5rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid var(--border-color);
-    }
-
-    .total-section {
-        background: var(--light-gray);
-        border-radius: 8px;
-        padding: 1rem;
-        margin-top: 1.5rem;
-        border: 1px solid var(--border-color);
-    }
-
-    .total-section h5 {
-        color: var(--dark-blue);
-        font-weight: 700;
-    }
-
-    .cash-fields {
-        background: var(--light-gray);
-        border-radius: 8px;
-        padding: 1rem;
-        margin-top: 1rem;
-        border: 1px solid var(--border-color);
-    }
-
-    .main-title {
-        color: var(--dark-blue);
-        font-weight: 800;
-        text-align: center;
-        margin-bottom: 2rem;
-        padding: 1.5rem;
-        background: var(--white);
-        border-radius: 12px;
-        border: 1px solid var(--border-color);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-
-    .medicine-name {
-        color: var(--dark-blue);
-        font-weight: 600;
-    }
-
-    .medicine-price {
-        color: var(--success);
-        font-size: 1.1em;
-        font-weight: 600;
-    }
-
-    .cart-empty {
-        text-align: center;
-        padding: 2rem;
-        color: var(--gray);
-        font-style: italic;
-    }
-
-    .search-container {
-        position: relative;
-    }
-
-    .quantity-controls {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .quantity-display {
-        min-width: 30px;
-        text-align: center;
-        font-weight: 600;
-        color: var(--dark-blue);
-    }
-
-    .form-label {
-        color: var(--dark-gray);
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-    }
-</style>
-<!-- 
-<div class="row mb-4">
-    <div class="col-12">
-        <h1 class="mb-3">
-            <i class="bi bi-receipt"></i> Pharmacy Billing
-        </h1>
-        <p class="text-muted">Select medicines and generate invoices</p>
-    </div>
-</div> -->
 
 <div class="container-fluid">
+    <!-- Search Bar Section -->
     <div class="row">
-        <!-- LEFT: Medicines -->
-        <div class="col-md-6">
-            <div class="medicine-section">
-                <h4 class="mb-3">
-                    <i class="bi bi-capsule"></i> Select Medicines
-                </h4>
-                <div class="search-container">
-                    <input type="text" id="search" class="form-control search-input mb-3"
-                        placeholder=" Search medicines...">
-                </div>
-
-                {% for medicine in medicines %}
-                <div class="medicine-item" data-id="{{ medicine.medicine_id }}">
-                    <div>
-                        <h6 class="medicine-name mb-1">{{ medicine.name }}</h6>
-                        <small class="text-muted">Stock: {{ medicine.stock_qty }}</small>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <strong class="medicine-price me-3">NRS {{ medicine.price }}</strong>
-                        <button class="btn add-btn">+</button>
-                    </div>
-                </div>
-                {% endfor %}
+        <div class="col-12">
+            <div class="search-container">
+                <label class="form-label fw-bold fs-5">
+                    <i class="bi bi-search me-2"></i>Search Medicine
+                </label>
+                <input type="text" id="billSearch" class="form-control search-input"
+                    placeholder="Type medicine name to search...">
+                <div id="suggestions" class="list-group mt-2" style="display: none;"></div>
             </div>
         </div>
+    </div>
 
-        <!-- RIGHT: Billing Section -->
-        <div class="col-md-6">
+    <!-- Billing Section -->
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
             <div class="billing-card">
-                <h4 class="mb-3">
-                    <i class="bi bi-cart-check"></i> Current Bill
-                </h4>
+                <!-- Billing Header -->
+                <div class="billing-header">
+                    <h4>
+                        <i class="bi bi-cart-check me-2"></i>Current Bill
+                    </h4>
+                </div>
 
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Customer Name *</label>
-                        <input type="text" id="customerName" class="form-control" placeholder="Enter customer name">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Phone Number</label>
-                        <input type="text" id="phoneNumber" class="form-control" placeholder="Optional">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Email</label>
-                        <input type="text" id="email" class="form-control" placeholder="Optional">
+                <!-- Customer Information -->
+                <div class="customer-info-section">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Customer Name *</label>
+                            <input type="text" id="customerName" class="form-control" placeholder="Enter customer name"
+                                required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Phone Number</label>
+                            <input type="text" id="phoneNumber" class="form-control" placeholder="Optional">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Email</label>
+                            <input type="email" id="email" class="form-control" placeholder="Optional">
+                        </div>
                     </div>
                 </div>
 
-                <div class="table-responsive">
-                    <table class="table table-bordered text-center">
-                        <thead>
-                            <tr>
-                                <th>S.N</th>
-                                <th>Item</th>
-                                <th>Qty</th>
-                                <th>Price</th>
-                                <th>Total</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="cart-items"></tbody>
-                    </table>
+                <!-- Cart Items -->
+                <div class="cart-table">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th width="8%">S.N</th>
+                                    <th width="32%">Item</th>
+                                    <th width="20%">Qty</th>
+                                    <th width="15%">Price</th>
+                                    <th width="15%">Total</th>
+                                    <th width="10%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cart-items"></tbody>
+                        </table>
+                    </div>
                 </div>
 
+                <!-- Totals Section -->
                 <div class="total-section">
-                    <div class="row">
-                        <div class="col-6">
-                            <p class="mb-2"><strong>Subtotal:</strong></p>
-                            <p class="mb-2"><strong>Discount (NRS):</strong></p>
-                            <h5 class="mb-0"><strong>Total:</strong></h5>
+                    <div class="total-row">
+                        <span class="total-label">Subtotal:</span>
+                        <span class="total-value" id="subtotal">NRS 0.00</span>
+                    </div>
+                    <div class="total-row">
+                        <span class="total-label">Discount (NRS):</span>
+                        <div>
+                            <input type="number" id="discount" class="form-control discount-input" value="0" min="0"
+                                step="0.01">
                         </div>
-                        <div class="col-6 text-end">
-                            <p class="mb-2" id="subtotal">NRS 0.00</p>
-                            <input type="number" id="discount" class="form-control text-end mb-2" value="0" min="0"
-                                step="0.01" style="max-width: 120px; display:inline-block;">
-                            <h5 class="mb-0" id="total">NRS 0.00</h5>
-                        </div>
+                    </div>
+                    <div class="total-row">
+                        <span class="total-label">Total Amount:</span>
+                        <span class="total-value" id="total">NRS 0.00</span>
                     </div>
                 </div>
 
-
-                <div class="mt-4">
+                <!-- Payment Method -->
+                <div class="payment-section">
                     <label class="form-label fw-bold">Payment Method</label>
                     <select id="paymentMethod" class="form-select">
                         <option value="">Select Payment Method</option>
-                        <option value="cash"><i class="bi bi-cash"></i> Cash</option>
-                        <option value="card"><i class="bi bi-credit-card"></i> Card</option>
-                        <option value="esewa"><i class="bi bi-phone"></i> eSewa</option>
+                        <option value="cash">💵 Cash</option>
+                        <option value="card">💳 Card</option>
+                        <option value="esewa">📱 eSewa</option>
                     </select>
-                </div>
 
-                <!-- Cash fields (hidden unless cash selected) -->
-                <div id="cashFields" class="cash-fields" style="display:none;">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Amount Received</label>
-                            <input type="number" id="amountReceived" class="form-control"
-                                placeholder="Enter amount received">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Return Amount</label>
-                            <input type="text" id="returnAmount" class="form-control" readonly>
+                    <!-- Cash Fields -->
+                    <div id="cashFields" class="cash-fields" style="display:none;">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Amount Received</label>
+                                <input type="number" id="amountReceived" class="form-control"
+                                    placeholder="Enter amount received">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Return Amount</label>
+                                <input type="text" id="returnAmount" class="form-control" readonly
+                                    style="background-color: #f8f9fa; font-weight: bold;">
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <button id="generateInvoiceBtn" class="btn btn-primary w-100 mt-4">
-                    <i class="bi bi-receipt"></i> Generate Invoice
-                </button>
+                <!-- Generate Invoice Button -->
+                <div class="d-grid gap-2 mt-4">
+                    <input type="hidden" name="csrfmiddlewaretoken" id="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                    <button id="generateInvoice" class="btn btn-success" type="button">
+                        <i class="bi bi-receipt"></i> Generate Invoice
+                    </button>
+                    <button id="clearCart" class="btn btn-outline-secondary" type="button">
+                        <i class="bi bi-trash"></i> Clear Cart
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const addButtons = document.querySelectorAll(".add-btn");
-        const cartTableBody = document.querySelector("#cart-items");
-        const subtotalEl = document.querySelector("#subtotal");
-        const discountEl = document.querySelector("#discount");
-        const totalEl = document.querySelector("#total");
-        const paymentMethod = document.querySelector("#paymentMethod");
-        const cashFields = document.querySelector("#cashFields");
-        const amountReceived = document.querySelector("#amountReceived");
-        const returnAmount = document.querySelector("#returnAmount");
-        const generateBtn = document.querySelector("#generateInvoiceBtn");
+document.addEventListener("DOMContentLoaded", function () {
+    const SEARCH_MEDICINES_URL = "/billing/search-medicines/";
 
-        let cart = [];
-        const discountInput = document.querySelector("#discount");
-        if (discountInput) {
-            discountInput.addEventListener("input", updateCart);
-        }
+    const cartTableBody = document.querySelector("#cart-items");
+    const subtotalEl = document.querySelector("#subtotal");
+    const discountInput = document.querySelector("#discount");
+    const totalEl = document.querySelector("#total");
+    const paymentMethod = document.querySelector("#paymentMethod");
+    const cashFields = document.querySelector("#cashFields");
+    const amountReceived = document.querySelector("#amountReceived");
+    const returnAmount = document.querySelector("#returnAmount");
+    const generateBtn = document.querySelector("#generateInvoice");
+    const clearCartBtn = document.querySelector("#clearCart");
+    const billSearch = document.getElementById("billSearch");
+    const suggestions = document.getElementById("suggestions");
 
+    let cart = [];
+    window.cart = cart;
+    window.updateCart = updateCart;
+    function updateReturnAmount() {
+    if (paymentMethod.value === "cash") {
+        const received = parseFloat(amountReceived.value || 0);
+        const total = parseFloat(totalEl.textContent.replace("NRS ", "")) || 0;
+        const change = received - total;
+        returnAmount.value = change >= 0 ? `NRS ${change.toFixed(2)}` : "Insufficient";
+        returnAmount.style.color = change >= 0 ? "green" : "red";
+    }
+}
 
-        function updateCart() {
-            cartTableBody.innerHTML = "";
-            let subtotal = 0;
+    function updateCart() {
+        cartTableBody.innerHTML = "";
+        let subtotal = 0;
 
-            if (cart.length === 0) {
+        if (cart.length === 0) {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td colspan="6" class="cart-empty">
+                    <i class="bi bi-cart-x fs-1"></i><br>
+                    <h5 class="mt-2">No items in cart</h5>
+                    <p class="text-muted">Start by searching and adding medicines above</p>
+                </td>`;
+            cartTableBody.appendChild(row);
+        } else {
+            cart.forEach((item, index) => {
+                let itemTotal = item.price * item.qty;
+                subtotal += itemTotal;
+
                 const row = document.createElement("tr");
                 row.innerHTML = `
-            <td colspan="6" class="cart-empty">
-                <i class="bi bi-cart-x"></i><br>
-                No items in cart
-            </td>
-        `;
+                    <td class="fw-bold">${index + 1}</td>
+                    <td class="text-start fw-semibold">${item.name}</td>
+                    <td>
+                        <div class="quantity-controls">
+                            <button class="quantity-btn decrease" data-index="${index}">-</button>
+                            <span class="quantity-display">${item.qty}</span>
+                            <button class="quantity-btn increase" data-index="${index}">+</button>
+                        </div>
+                    </td>
+                    <td class="fw-semibold text-success">NRS ${item.price.toFixed(2)}</td>
+                    <td class="fw-bold text-primary">NRS ${itemTotal.toFixed(2)}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm remove" data-index="${index}" 
+                                title="Remove item">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>`;
                 cartTableBody.appendChild(row);
-            } else {
-                cart.forEach((item, index) => {
-                    const itemTotal = item.price * item.qty;
-                    subtotal += itemTotal;
-
-                    const row = document.createElement("tr");
-                    row.innerHTML = `
-              <td>${index + 1}</td>
-              <td class="text-start">${item.name}</td>
-              <td>
-                <div class="quantity-controls">
-                    <button class="btn btn-sm btn-outline-secondary decrease" data-index="${index}">-</button>
-                    <span class="quantity-display">${item.qty}</span>
-                    <button class="btn btn-sm btn-outline-secondary increase" data-index="${index}">+</button>
-                </div>
-              </td>
-              <td>NRS ${item.price.toFixed(2)}</td>
-              <td class="fw-bold">NRS ${itemTotal.toFixed(2)}</td>
-              <td><button class="btn btn-sm btn-danger remove" data-index="${index}">×</button></td>
-            `;
-                    cartTableBody.appendChild(row);
-                });
-            }
-
-            const discountInput = document.querySelector("#discount");
-            const discount = parseFloat(discountInput?.value || 0);
-            const total = subtotal - discount;
-
-            subtotalEl.textContent = `NRS ${subtotal.toFixed(2)}`;
-            totalEl.textContent = `NRS ${Math.max(total, 0).toFixed(2)}`;
-
-            if (paymentMethod && paymentMethod.value === "cash" && amountReceived && amountReceived.value) {
-                const received = parseFloat(amountReceived.value);
-                const change = received - total;
-                if (returnAmount) {
-                    returnAmount.value = change >= 0 ? `NRS ${change.toFixed(2)}` : "Insufficient";
-                }
-            }
-        }
-
-        addButtons.forEach(button => {
-            button.addEventListener("click", () => {
-                const medicineDiv = button.closest(".medicine-item");
-                const id = parseInt(medicineDiv.dataset.id); // FIX: Use correct data attribute
-                const name = medicineDiv.querySelector(".medicine-name").textContent.trim();
-                const price = parseFloat(medicineDiv.querySelector(".medicine-price").textContent.replace("NRS ", ""));
-
-                const existing = cart.find(item => item.id === id);
-                if (existing) {
-                    existing.qty += 1;
-                } else {
-                    cart.push({ id, name, price, qty: 1 });
-                }
-                updateCart();
-            });
-        });
-
-        cartTableBody.addEventListener("click", (e) => {
-            const index = e.target.dataset.index;
-            if (e.target.classList.contains("increase")) cart[index].qty++;
-            else if (e.target.classList.contains("decrease")) cart[index].qty > 1 ? cart[index].qty-- : cart.splice(index, 1);
-            else if (e.target.classList.contains("remove")) cart.splice(index, 1);
-            updateCart();
-        });
-
-        paymentMethod.addEventListener("change", () => {
-            if (paymentMethod.value === "cash") {
-                if (cashFields) cashFields.style.display = "block";
-            } else {
-                if (cashFields) cashFields.style.display = "none";
-                if (amountReceived) amountReceived.value = "";
-                if (returnAmount) returnAmount.value = "";
-            }
-        });
-
-        if (amountReceived) {
-            amountReceived.addEventListener("input", updateCart);
-        }
-
-        // Search functionality
-        const searchInput = document.querySelector("#search");
-        if (searchInput) {
-            searchInput.addEventListener("input", function () {
-                const searchTerm = this.value.toLowerCase();
-                const medicineItems = document.querySelectorAll(".medicine-item");
-
-                medicineItems.forEach(item => {
-                    const medicineName = item.querySelector(".medicine-name").textContent.toLowerCase();
-                    if (medicineName.includes(searchTerm)) {
-                        item.style.display = "flex";
-                    } else {
-                        item.style.display = "none";
-                    }
-                });
             });
         }
 
-        // ✅ Generate Invoice
-        generateBtn.addEventListener("click", async () => {
-            const customerNameEl = document.querySelector("#customerName");
-            const phoneNumberEl = document.querySelector("#phoneNumber");
-            const amountReceivedEl = document.querySelector("#amountReceived");
-            const returnAmountEl = document.querySelector("#returnAmount");
+        const discount = parseFloat(discountInput?.value || 0);
+        const total = Math.max(subtotal - discount, 0);
 
-            const customerName = customerNameEl ? customerNameEl.value.trim() : "";
-            const phoneNumber = phoneNumberEl ? phoneNumberEl.value.trim() : "";
-            const method = paymentMethod ? paymentMethod.value : "";
-            const received = amountReceivedEl ? amountReceivedEl.value.trim() : "";
-            const returned = returnAmountEl ? returnAmountEl.value.trim() : "";
-            const subtotal = parseFloat(subtotalEl.textContent.replace("NRS ", ""));
-            const discount = parseFloat(discountEl.textContent.replace("NRS ", ""));
-            const total = parseFloat(totalEl.textContent.replace("NRS ", ""));
+        subtotalEl.textContent = `NRS ${subtotal.toFixed(2)}`;
+        totalEl.textContent = `NRS ${total.toFixed(2)}`;
 
-            if (!customerName || !method || cart.length === 0) {
-                alert("Please fill customer name, select payment method, and add items.");
-                return;
-            }
+        if (paymentMethod.value === "cash" && amountReceived.value) {
+            const received = parseFloat(amountReceived.value);
+            const change = received - total;
+            returnAmount.value = change >= 0 ? `NRS ${change.toFixed(2)}` : "Insufficient";
+            returnAmount.style.color = change >= 0 ? "green" : "red";
+        }
+        updateReturnAmount();
+    }
 
-            // Prepare data for sending
-            const invoiceData = {
-                customerName,
-                phoneNumber: phoneNumber || null,
-                paymentMethod: method,
-                amountReceived: received || null,
-                returnAmount: returned || null,
-                subtotal,
-                discount,
-                total,
-                items: cart
-            };
+    // Search medicines (unchanged)
+    billSearch.addEventListener("input", function () {
+        const query = this.value.trim();
+        if (query.length < 2) {
+            suggestions.style.display = "none";
+            suggestions.innerHTML = "";
+            return;
+        }
+        suggestions.innerHTML = `<div class="list-group-item">Searching...</div>`;
+        suggestions.style.display = "block";
 
-            console.log("Sending invoice data:", invoiceData);
-
-            try {
-                const response = await fetch("/billing/generate-invoice/", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRFToken": getCookie("csrftoken")
-                    },
-                    body: JSON.stringify(invoiceData)
-                });
-
-                const data = await response.json();
-                console.log("Response:", data);
-
-                if (response.ok && data.invoice_id) {
-                    // Redirect to invoice detail page
-                    window.location.href = `/billing/invoice/${data.invoice_id}/`;
+        fetch(`${SEARCH_MEDICINES_URL}?q=${encodeURIComponent(query)}`)
+            .then(res => res.json())
+            .then(data => {
+                suggestions.innerHTML = "";
+                if (data.results && data.results.length > 0) {
+                    data.results.forEach(item => {
+                        const button = document.createElement("button");
+                        button.type = "button";
+                        button.className = "list-group-item list-group-item-action suggestion-item";
+                        button.innerHTML = `<div class="d-flex justify-content-between align-items-center">
+                            <div class="text-start">
+                                <strong>${item.name}</strong><br><small>${item.brand_name || ''}</small>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold">NRS ${parseFloat(item.price).toFixed(2)}</div>
+                                <small>Stock: ${item.stock}</small>
+                            </div></div>`;
+                        button.addEventListener("click", () => {
+                            let existing = cart.find(i => i.id === item.id);
+                            if (existing) existing.qty += 1;
+                            else cart.push({ id: item.id, name: item.name, price: parseFloat(item.price), qty: 1 });
+                            updateCart();
+                            suggestions.style.display = "none";
+                            billSearch.value = "";
+                        });
+                        suggestions.appendChild(button);
+                    });
                 } else {
-                    // Show specific error message
-                    const errorMsg = data.error || `HTTP ${response.status}: ${response.statusText}`;
-                    alert("Error generating invoice: " + errorMsg);
-                    console.error("Invoice generation failed:", errorMsg);
+                    suggestions.innerHTML = `<div class="list-group-item text-muted">No medicines found</div>`;
                 }
-            } catch (error) {
-                console.error("Network error:", error);
-                alert("Network error: " + error.message);
-            }
+            });
+    });
 
-        });
-
-        // Helper for CSRF
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
+    document.addEventListener("click", function (e) {
+        if (!billSearch.contains(e.target) && !suggestions.contains(e.target)) {
+            suggestions.style.display = "none";
         }
     });
+
+    // Cart quantity & remove
+    cartTableBody.addEventListener("click", (e) => {
+        const index = parseInt(e.target.dataset.index);
+        if (isNaN(index)) return;
+        const target = e.target.closest("button");
+        if (target.classList.contains("increase")) cart[index].qty++;
+        else if (target.classList.contains("decrease")) {
+            if (cart[index].qty > 1) cart[index].qty--;
+            else cart.splice(index, 1);
+        } else if (target.classList.contains("remove")) cart.splice(index, 1);
+        updateCart();
+    });
+
+    // Payment method toggle
+    paymentMethod.addEventListener("change", () => {
+        if (paymentMethod.value === "cash") cashFields.style.display = "block";
+        else {
+            cashFields.style.display = "none";
+            amountReceived.value = "";
+            returnAmount.value = "";
+        }
+    });
+
+    amountReceived?.addEventListener("input", updateCart);
+    discountInput?.addEventListener("input", updateCart);
+
+    // Generate Invoice
+   // Generate Invoice
+document.getElementById('generateInvoice').addEventListener('click', async () => {
+    const customerName = document.querySelector('#customerName').value.trim();
+    const phoneNumber = document.querySelector('#phoneNumber').value.trim();
+    const method = paymentMethod.value;
+    const received = amountReceived.value.trim();
+    const returned = returnAmount.value.trim();
+    const subtotal = parseFloat(subtotalEl.textContent.replace('NRS ', '')) || 0;
+    const discount = parseFloat(discountInput.value) || 0;
+    const total = parseFloat(totalEl.textContent.replace('NRS ', '')) || 0;
+
+    if (!customerName || !method || cart.length === 0) {
+        alert('Please fill customer name, select payment method, and add items.');
+        return;
+    }
+
+    const invoiceData = {
+        customer_name: customerName,
+        phone_number: phoneNumber || null,
+        payment_method: method,
+        amount_received: received ? parseFloat(received) : null,
+        return_amount: returned && returned !== "Insufficient" ? parseFloat(returned.replace('NRS ', '')) : null,
+        subtotal: subtotal,
+        discount: discount,
+        total: total,
+        items: cart
+    };
+
+    try {
+        const response = await fetch('{% url "generate_invoice" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify(invoiceData)
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        if (1) {
+            if (data.invoice_id) {
+                window.location.href = `/billing/invoice/${data.invoice_id}/`;
+                alert(`Invoice generated successfully! Invoice ID: ${data.invoice_id}`);
+            }
+
+            // Reset cart and form
+            cart = [];
+            updateCart();
+            document.querySelector('#customerName').value = '';
+            document.querySelector('#phoneNumber').value = '';
+            paymentMethod.value = '';
+            amountReceived.value = '';
+            returnAmount.value = '';
+            cashFields.style.display = 'none';
+        } else {
+            alert(`Error generating invoice: ${data.error || 'Unknown error'}`);
+        }
+    } catch (error) {
+        console.error('Error generating invoice:', error);
+        alert('Error generating invoice. Please check console for details.');
+    }
+});
+
+
+    // Initialize
+    updateCart();
+});
 </script>
+
+
 {% endblock %}

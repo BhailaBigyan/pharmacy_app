@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Company Registration{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Company Registration</h2>
+
+    {# Display Django messages if any #}
+    {% if messages %}
+        <ul class="messages list-unstyled p-0">
+            {% for message in messages %}
+                <li {% if message.tags %} class="{{ message.tags }} alert alert-{{ message.tags }} p-2" {% endif %}>
+                    {{ message }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <form method="post" action="{% url 'company_register' %}" class="bg-light p-4 rounded shadow-sm">
+        {% csrf_token %}
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="company_name" class="form-label">Company Name (Required)</label>
+                    <input type="text" class="form-control" id="company_name" name="company_name" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="address" class="form-label">Address (Required)</label>
+                    <input type="text" class="form-control" id="address" name="address" required>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="phone_number" class="form-label">Phone Number (Required)</label>
+                    <input type="text" class="form-control" id="phone_number" name="phone_number" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="pan_number" class="form-label">PAN Number</label>
+                    <input type="text" class="form-control" id="pan_number" name="pan_number">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="vat_number" class="form-label">VAT Number</label>
+                    <input type="text" class="form-control" id="vat_number" name="vat_number">
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">
+            <i class="bi bi-building"></i> Register Company
+        </button>
+    </form>
+</div>
+{% endblock %}

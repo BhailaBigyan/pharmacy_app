@@ -58,7 +58,8 @@ def supplier_report(request):
     }
     return render(request, 'admin/supplier/supplier_report.html', context)
 
-    from django.shortcuts import get_object_or_404, render
+
+from django.shortcuts import get_object_or_404, render
 from .models import SupplierInvoice
 def list_supplier(request):
     suppliers = Supplier.objects.all()

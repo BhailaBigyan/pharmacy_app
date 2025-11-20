@@ -54,6 +54,8 @@
                                 <option value="tablet/capsule">Tablet/Capsule</option>
                                 <option value="liquid">Liquid</option>
                                 <option value="patch">Patch</option>
+                                <option value="dose form">Dose Form</option>
+                                <option value="ointment">Ointment</option>
                                 <option value="cream">Topical Cream</option>
                             </select>
                         </div>
@@ -104,8 +106,9 @@
                                     <th>Brand</th>
                                     <th>Batch Number</th>
                                     <th>Category</th>
-                                    <th>Price</th>
+                                    <th>MRP</th>
                                     <th>Stock</th>
+                                    <th>Total Value</th>
                                     <th>Mfg Date</th>
                                     <th>Exp Date</th>
                                     <th>Supplier</th>
@@ -126,6 +129,7 @@
                                             {{ medicine.stock_qty }}
                                         </span>
                                     </td>
+                                    <td>NRS {{ medicine.total_price|floatformat:2 }}</td>
                                     <td>{{ medicine.mfg_date|date:"Y-m-d" }}</td>
                                     <td>
                                         <span class="{% if medicine.exp_date < today %}text-danger{% elif medicine.exp_date <= expiring_soon_date %}text-warning{% else %}text-success{% endif %}">
@@ -141,6 +145,7 @@
                                         {% else %}
                                             <span class="badge bg-success">In Stock</span>
                                         {% endif %}
+
                                         {% if medicine.exp_date < today %}
                                             <span class="badge bg-danger ms-1">Expired</span>
                                         {% elif medicine.exp_date <= expiring_soon_date %}
@@ -149,7 +154,7 @@
                                     </td>
                                 </tr>
                                 {% empty %}
-                                <tr><td colspan="10" class="text-center text-muted">No medicines found</td></tr>
+                                
                                 {% endfor %}
                             </tbody>
                         </table>
@@ -159,10 +164,9 @@
         </div>
     </div>
 </div>
-<!-- jQuery (required by DataTables) -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-<!-- DataTables & Buttons (already included in your template; keep them) -->
+<!-- jQuery & DataTables JS (same as before) -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
@@ -173,11 +177,9 @@
 
 <script>
 $(document).ready(function() {
-    // Parse dates from Django context (format YYYY-MM-DD). Make sure these are present in context.
     var today = new Date("{{ today|date:'Y-m-d' }}");
     var expiringSoonDate = new Date("{{ expiring_soon_date|date:'Y-m-d' }}");
 
-    // Init DataTable with buttons including Print
     var table = $('#stockTable').DataTable({
         order: [[0, 'asc']],
         pageLength: 25,
@@ -188,7 +190,6 @@ $(document).ready(function() {
             { extend: 'pdfHtml5', text: '<i class="bi bi-file-pdf"></i> PDF', className: 'btn btn-danger btn-sm' },
             { extend: 'print', text: '<i class="bi bi-printer"></i> Print', className: 'btn btn-primary btn-sm',
                 customize: function ( win ) {
-                    // Optional: keep printed table compact and clean
                     $(win.document.body).css('font-size', '12px').prepend(
                         '<h3>Stock Inventory Report</h3><p>Printed: ' + new Date().toLocaleString() + '</p>'
                     );
@@ -197,104 +198,57 @@ $(document).ready(function() {
         ]
     });
 
-    // Helper: parse a date string (YYYY-MM-DD) into Date object ignoring timezone issues
     function parseYMD(dateStr) {
         if (!dateStr) return null;
-        // trim and use split to avoid Date parsing differences
         var parts = dateStr.trim().split('-');
         if (parts.length < 3) return null;
-        return new Date(parts[0], parts[1] - 1, parts[2]); // year, monthIndex, day
+        return new Date(parts[0], parts[1] - 1, parts[2]);
     }
 
-    // Custom filter function using real values from the table rows
     $.fn.dataTable.ext.search.push(function(settings, rowData, dataIndex) {
-        // Only apply to our table
         if (settings.nTable.id !== 'stockTable') return true;
 
-        var categoryFilter = $('#categoryFilter').val(); // e.g. "tablet/capsule"
-        var stockFilter = $('#stockFilter').val();       // in-stock, low-stock, out-of-stock
-        var expiryFilter = $('#expiryFilter').val();     // expired, expiring-soon, valid
+        var categoryFilter = $('#categoryFilter').val();
+        var stockFilter = $('#stockFilter').val();
+        var expiryFilter = $('#expiryFilter').val();
 
-        // columns indexes in your table:
-        // 0: ID, 1: Name, 2: Brand, 3: Batch, 4: Category, 5: Price, 6: Stock, 7: Mfg, 8: Exp Date, 9: Supplier, 10: Status
-
-        // Get raw values from the row DOM (safer than data array because badges may contain markup)
         var rowNode = table.row(dataIndex).node();
-
-        // Category text (column 4)
         var catText = $('td:eq(4)', rowNode).text().trim().toLowerCase();
-
-        // Stock numeric value (column 6) - remove non-numeric
         var stockText = $('td:eq(6) span', rowNode).text().trim();
         var stockValue = parseInt(stockText.replace(/[^\d-]/g, '')) || 0;
-
-        // Expiry date (column 8) as string (YYYY-MM-DD)
         var expText = $('td:eq(8) span', rowNode).text().trim();
-        // Try parsing; if template prints as 'YYYY-MM-DD' this will work
         var expDate = parseYMD(expText);
 
-        // ----- Category Filter -----
-        if (categoryFilter) {
-            // normalize both sides
-            if (catText !== categoryFilter.toLowerCase()) {
-                return false;
-            }
-        }
+        if (categoryFilter && catText !== categoryFilter.toLowerCase()) return false;
 
-        // ----- Stock Filter -----
         if (stockFilter) {
             if (stockFilter === 'in-stock' && stockValue <= 10) return false;
             if (stockFilter === 'low-stock' && (stockValue === 0 || stockValue > 10)) return false;
             if (stockFilter === 'out-of-stock' && stockValue !== 0) return false;
         }
 
-        // ----- Expiry Filter -----
         if (expiryFilter) {
-            var isExpired = false;
-            var isExpiringSoon = false;
-            var isValid = false;
-
+            var isExpired = false, isExpiringSoon = false, isValid = false;
             if (expDate) {
-                // compare dates ignoring time
                 var exp = new Date(expDate.getFullYear(), expDate.getMonth(), expDate.getDate());
                 var td = new Date(today.getFullYear(), today.getMonth(), today.getDate());
                 var esd = new Date(expiringSoonDate.getFullYear(), expiringSoonDate.getMonth(), expiringSoonDate.getDate());
 
-                if (exp < td) {
-                    isExpired = true;
-                } else if (exp <= esd) {
-                    isExpiringSoon = true;
-                } else {
-                    isValid = true;
-                }
-            } else {
-                // if expiry not parseable, treat as valid (or change logic as needed)
-                isValid = true;
-            }
+                if (exp < td) isExpired = true;
+                else if (exp <= esd) isExpiringSoon = true;
+                else isValid = true;
+            } else isValid = true;
 
             if (expiryFilter === 'expired' && !isExpired) return false;
             if (expiryFilter === 'expiring-soon' && !isExpiringSoon) return false;
             if (expiryFilter === 'valid' && !isValid) return false;
         }
 
-        // passed all filters
         return true;
     });
 
-    // Apply filters (redraw table)
-    window.applyFilters = function() {
-        table.draw();
-    };
-
-    // Live apply on change
-    $('#categoryFilter, #stockFilter, #expiryFilter').on('change', function() {
-        applyFilters();
-    });
-
-    // Optional: reset filters button (if present) - keeps UX
-    // $('#resetFiltersBtn').on('click', function() { $('#categoryFilter, #stockFilter, #expiryFilter').val(''); applyFilters(); });
-
-    // Ensure initial draw applies filters (if template preselects anything)
+    window.applyFilters = function() { table.draw(); };
+    $('#categoryFilter, #stockFilter, #expiryFilter').on('change', function() { applyFilters(); });
     table.draw();
 });
 </script>

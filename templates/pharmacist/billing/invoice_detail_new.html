@@ -3,7 +3,20 @@
 
 {% block content %}
 <div class="container-fluid">
-    <div class="row mb-4">
+    {# 1. Print-Only Company Header (Visible only when printing) #}
+    <div class="row mb-4 d-none d-print-block print-company-header">
+        <div class="col-12 text-center mb-4">
+            <h2 class="mb-1">🏥 HealthyLife Pharmacy 💊</h2>
+            <p class="mb-0">123 Main St, Kathmandu, Nepal</p>
+            <p class="mb-0">Phone: +977-9841000000</p>
+            <p class="mb-0">VAT No: 600123456 | PAN No: 301000000</p>
+            <h3 class="mt-4 mb-0 text-uppercase bill-title">BILL</h3>
+            <hr class="w-25 mx-auto mt-1 mb-4" style="border-top: 2px solid #333;">
+        </div>
+    </div>
+
+    {# Screen View Invoice Header (Hidden when printing) #}
+    <div class="row mb-4 d-print-none">
         <div class="col-12">
             <h1 class="mb-3">
                 <i class="bi bi-receipt"></i> Invoice #{{ invoice.invoice_id }}
@@ -12,65 +25,66 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card">
-                <div class="card-header">
+    {# --- PRINT LAYOUT CONTAINER (FIXED FOR PRINTING) --- #}
+    <div class="row print-main-content">
+        
+        {# LEFT COLUMN: DETAILS & ITEMS (70% in Print) #}
+        <div class="col-lg-8 print-left-content">
+            <div class="card invoice-details-card">
+                <div class="card-header d-print-none">
                     <h5 class="mb-0">
                         <i class="bi bi-info-circle"></i> Invoice Details
                     </h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body print-details-body">
                     <div class="row">
-                        <div class="col-md-6">
-                            <h6>Customer Information:</h6>
-                            <p><strong>Name:</strong> {{ invoice.customer_name }}</p>
+                        <div class="col-md-12 col-print-left">
+                            <h6>BILLED TO:</h6>
+                            <p class="mb-1">Name: {{ invoice.customer_name }}</p>
                             {% if invoice.phone_number %}
-                            <p><strong>Phone:</strong> {{ invoice.phone_number }}</p>
+                            <p class="mb-1">Phone: {{ invoice.phone_number }}</p>
                             {% endif %}
-                            <p><strong>Billed By:</strong> {{ invoice.billed_by }}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <h6>Payment Details:</h6>
-                            <p><strong>Method:</strong> {{ invoice.get_payment_method_display }}</p>
-                            {% if invoice.payment_method == "cash" and invoice.amount_received %}
-                            <p><strong>Amount Received:</strong> NRS {{ invoice.amount_received|floatformat:2 }}</p>
-                            <p><strong>Change:</strong> NRS {{ invoice.return_amount|floatformat:2 }}</p>
+                            {% if invoice.email_address %}
+                            <p class="mb-1">Email: {{ invoice.email_address }}</p>
                             {% endif %}
+                            
+                            <p class="mb-1">INVOICE: INV-{{ invoice.invoice_id }}</p>
+                            <p class="mb-1">Date: {{ invoice.created_at|date:"d M Y" }}</p>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="card mt-4">
-                <div class="card-header">
+            </div}
+            <div class="card mt-4 items-card">
+                <div class="card-header d-print-none">
                     <h5 class="mb-0">
                         <i class="bi bi-list"></i> Items
                     </h5>
                 </div>
                 <div class="card-body">
-                    <table class="table">
+                    <table class="table print-items-table">
                         <thead>
                             <tr>
-                                <th>#</th>
-                                <th>Medicine</th>
-                                <th>Quantity</th>
-                                <th>Price</th>
-                                <th>Total</th>
+                                <th>Description</th>
+                                <th>Qty</th>
+                                <th>Unit Price (NRS)</th>
+                                <th>Total Price (NRS)</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for item in invoice.items.all %}
                             <tr>
-                                <td>{{ forloop.counter }}</td>
                                 <td>{{ item.medicine.name }}</td>
                                 <td>{{ item.quantity }}</td>
-                                <td>NRS {{ item.price|floatformat:2 }}</td>
-                                <td>NRS {{ item.total|floatformat:2 }}</td>
+                                <td>{{ item.price|floatformat:2 }}</td>
+                                <td>{{ item.total|floatformat:2 }}</td>
                             </tr>
-                            {% empty %}
+                            {% endfor %}
+                            {% for _ in 1|ljust:5 %}
                             <tr>
-                                <td colspan="5" class="text-center text-muted">No items found for this invoice.</td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -79,8 +93,11 @@
             </div>
         </div>
 
-        <div class="col-lg-4">
-            <div class="card">
+        {# RIGHT COLUMN: SUMMARY & ACTIONS #}
+        <div class="col-lg-4 summary-col-print">
+            
+            {# 3. Summary Card (Visible on Screen AND styled for Print) #}
+            <div class="card mt-4 summary-card-print">
                 <div class="card-header">
                     <h5 class="mb-0">
                         <i class="bi bi-calculator"></i> Summary
@@ -88,22 +105,22 @@
                 </div>
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
-                        <span><strong>Subtotal:</strong></span>
-                        <span><strong>NRS {{ invoice.subtotal|floatformat:2 }}</strong></span>
+                        <span>Subtotal:</span>
+                        <span>NRS {{ invoice.subtotal|floatformat:2 }}</span>
                     </div>
                     <div class="d-flex justify-content-between">
-                        <span><strong>Discount :</strong></span>
-                        <span><strong>NRS {{ invoice.discount|floatformat:2 }}</strong></span>
+                        <span>Discount:</span>
+                        <span>NRS {{ invoice.discount|floatformat:2 }}</span>
                     </div>
-                    <hr>
-                    <div class="d-flex justify-content-between">
-                        <span><strong>TOTAL:</strong></span>
-                        <span><strong>NRS {{ invoice.total|floatformat:2 }}</strong></span>
+                    <hr class="d-print-none"> 
+                    <div class="d-flex justify-content-between total-row">
+                        <span>TOTAL:</span>
+                        <span>NRS {{ invoice.total|floatformat:2 }}</span>
                     </div>
                 </div>
-            </div>
-
-            <div class="card mt-4">
+            </div}
+            {# 4. Actions Card (Visible on Screen ONLY) #}
+            <div class="card mt-4 actions-card d-print-none">
                 <div class="card-header">
                     <h5 class="mb-0">
                         <i class="bi bi-gear"></i> Actions
@@ -125,99 +142,171 @@
             </div>
         </div>
     </div>
+    
+    {# 5. Bottom Info (Billed By / Thank You) - Hidden on Screen, Visible on Print #}
+    <div class="row mt-4 print-bottom-info d-none d-print-flex">
+        <div class="col-md-6 col-print-left">
+            <h6 class="mb-1">PAYMENT INFORMATION:</h6>
+            <p class="mb-1">Method: {{ invoice.get_payment_method_display }}</p>
+            <p class="mb-1">Billed By: {{ invoice.billed_by }}</p>
+        </div>
+        <div class="col-md-6 col-print-right text-end">
+            <p class="mb-1">Thank you for shopping at HealthyLife Pharmacy!</p>
+            <p class="mb-1">Visit us again soon!</p>
+        </div>
+    </div>
 </div>
 
-<!-- Print-only styles -->
 <style media="print">
-    .card-header, .btn, .nav, .header, .footer {
-        display: none !important;
-    }
-    
-    .card {
-        border: 1px solid #000 !important;
-        box-shadow: none !important;
-    }
-    
+    /* --- General Print Setup --- */
     body {
-        background: white !important;
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        color: #000;
+        background: #fff !important;
+        margin: 0;
+        padding: 0;
     }
     
     .container-fluid {
-        max-width: none !important;
-        padding: 0 !important;
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 0;
+        border: 1px solid #000; /* Main border for the bill */
     }
-    
-    .row {
+
+    /* Hide screen elements */
+    .d-print-none, .actions-card, .card-header, .btn, .nav, .header, .footer {
+        display: none !important;
+    }
+
+    /* Show print elements */
+    .d-print-block { display: block !important; }
+    .d-print-flex { display: flex !important; }
+
+    /* --- Company Header Styling --- */
+    .print-company-header {
+        margin-top: 20px !important;
+        padding-bottom: 0 !important;
+        border-bottom: 1px solid #000; /* Separator for company header */
+    }
+    .bill-title {
+        font-size: 14px;
+        font-weight: bold;
+        padding: 5px 0;
+        margin: 0 !important;
+        /* Removed background and border here, relying on text only */
+    }
+    .print-company-header hr { /* The HR under BILL */
+        border: none;
+        border-top: 1px dashed #000 !important;
+        width: 100px;
+        margin-top: 5px !important;
+        margin-bottom: 5px !important;
+    }
+
+    /* --- PRINT LAYOUT FIX (Using display: table) --- */
+    .print-main-content {
+        display: table;
+        width: 100%;
+        border-collapse: collapse;
         margin: 0 !important;
     }
-    
-    .col-lg-8, .col-lg-4 {
-        width: 100% !important;
-        max-width: none !important;
+    .print-left-content {
+        display: table-cell;
+        width: 70% !important;
+        padding: 10px 0 10px 15px !important; 
+        vertical-align: top;
+        border-right: 1px solid #000; /* Separator between details and summary */
     }
-    
-    .card {
-        margin-bottom: 20px !important;
+    .summary-col-print {
+        display: table-cell;
+        width: 30% !important;
+        padding: 10px 15px 10px 10px !important; 
+        vertical-align: top;
     }
-    
-    h1, h5, h6 {
-        color: black !important;
+
+    /* --- Details and Items Styling --- */
+    .invoice-details-card { border: none !important; }
+    .invoice-details-card .print-details-body {
+        padding: 0 !important;
     }
-    
-    .text-muted {
-        color: #666 !important;
-    }
-    
-    .text-primary {
-        color: black !important;
-    }
-    
-    .text-success {
-        color: black !important;
-    }
-    
-    .table {
-        border-collapse: collapse !important;
-    }
-    
-    .table th, .table td {
-        border: 1px solid #000 !important;
-        padding: 8px !important;
-    }
-    
-    .table thead th {
-        background-color: #f8f9fa !important;
-        font-weight: bold !important;
-    }
-    
-    hr {
-        border-top: 1px solid #000 !important;
-    }
-    
-    /* Print-only message */
-    .print-only {
-        display: block !important;
-        text-align: center;
-        margin-top: 30px;
-        font-size: 18px;
+    .print-left-content h6 {
+        font-size: 13px;
         font-weight: bold;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+    }
+
+    .items-card {
+        margin-top: 10px !important;
+        border: none !important;
+    }
+    .items-card .card-body {
+        padding: 0 !important;
+    }
+    .print-items-table {
+        margin: 0 !important;
+        width: 100%;
+        border-top: 1px solid #000;
+        border-collapse: collapse;
+    }
+    .print-items-table th, .print-items-table td {
+        border: 1px solid #000 !important;
+        padding: 6px 8px !important;
+        vertical-align: top;
+        text-align: left;
+        font-size: 12px;
+        /* Only apply border bottom/top to create grid look */
+        border-left: none !important;
+        border-right: none !important;
+    }
+    .print-items-table th {
+        background-color: #f0f0f0 !important;
+        font-weight: bold;
+        text-transform: uppercase;
+        color: #000 !important;
+    }
+    .print-items-table td:nth-child(2), /* Qty */
+    .print-items-table td:nth-child(3), /* Unit Price */
+    .print-items-table td:nth-child(4) { /* Total Price */
+        text-align: right;
+    }
+
+    /* --- Summary Card Styling (Fixed) --- */
+    .summary-card-print {
+        margin-top: 0 !important; /* Remove margin-top in print */
+        border: none !important;
+        padding: 0 !important;
+        /* The container itself will not have a border, the items will */
+    }
+    .summary-card-print .card-body {
+        padding: 0 !important;
+    }
+    .summary-card-print .d-flex {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 0;
+        border-bottom: 1px solid #000;
+        width: 100%;
+    }
+    .summary-card-print .d-flex:first-child {
+        border-top: 1px solid #000;
+    }
+    .summary-card-print hr {
+        display: none !important; 
+    }
+
+    /* --- Bottom Info (Billed By / Thank You) --- */
+    .print-bottom-info {
+        padding: 15px;
+        border-top: 1px solid #000;
+        margin: 0 !important;
+        width: 100%;
+        clear: both; 
+    }
+    .print-bottom-info .col-md-6 {
+        padding: 0 10px;
     }
 </style>
-
-<!-- Print-only thank you message -->
-<div class="print-only" style="display: none;">
-    <p>Thank you for your business!</p>
-    <p>Visit us again soon!</p>
-</div>
-
-<script>
-    // Show print-only message when printing
-    window.addEventListener('beforeprint', function() {
-        document.querySelector('.print-only').style.display = 'block';
-    });
-    
-    window.addEventListener('afterprint', function() {
-        document.querySelector('.print-only').style.display = 'none';
-    });
-</script>
 {% endblock %}

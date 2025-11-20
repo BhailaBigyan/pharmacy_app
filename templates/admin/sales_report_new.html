@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% block title %}Sales Report - Pharmacy Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-3">
+                <i class="bi bi-graph-up"></i> Sales Report
+            </h1>
+            <p class="text-muted">View and analyze sales data</p>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-number text-success">NRS {{ total_sales|floatformat:2 }}</div>
+                <div class="stat-label">Total Sales</div>
+            </div>
+        </div>
+       
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-number text-primary">{{ invoices.count }}</div>
+                <div class="stat-label">Total Invoices</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Date Filter -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-funnel"></i> Filter by Date
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="start_date" class="form-label">Start Date</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date" value="{{ start_date }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="end_date" class="form-label">End Date</label>
+                            <input type="date" class="form-control" id="end_date" name="end_date" value="{{ end_date }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-search"></i> Filter
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sales Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-table"></i> Sales Transactions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table" id="salesTable">
+                            <thead>
+                                <tr>
+                                    <th>Invoice #</th>
+                                    <th>Date</th>
+                                    <th>Customer</th>
+                                    <th>Payment Method</th>
+                                    <th>Subtotal</th>
+                                    <th>Discount</th>
+                                    <th>Total</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for invoice in invoices %}
+                                <tr>
+                                    <td>{{ invoice.invoice_id }}</td>
+                                    <td>{{ invoice.created_at|date:"Y-m-d H:i" }}</td>
+                                    <td>{{ invoice.customer_name }}</td>
+                                    <td>{{ invoice.payment_method|title }}</td>
+                                    <td>NRS {{ invoice.subtotal|floatformat:2 }}</td>
+                                    <td>NRS {{ invoice.discount|floatformat:2 }}</td>
+                                    <td><strong>NRS {{ invoice.total|floatformat:2 }}</strong></td>
+                                    <td>
+                                        <a href="{% url 'invoice_detail' invoice.invoice_id %}"
+                                            class="btn btn-sm btn-outline-primary">View</a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center text-muted">No sales data available</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DataTables -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
+<script>
+    $(document).ready(function() {
+        $('#salesTable').DataTable({
+            "order": [[ 0, "desc" ]], // Order by Invoice # descending
+            "columnDefs": [
+                { "orderable": false, "targets": 7 } // Disable sorting on Action column
+            ],
+            "pageLength": 25,
+            "responsive": true
+        });
+    });
+</script>
+{% endblock %}

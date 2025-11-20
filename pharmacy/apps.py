@@ -28,8 +28,8 @@ class PharmacyConfig(AppConfig):
                         password=admin_password,
                         role="admin"
                     )
-                else:
-                    print("Admin user already exists ✔")
+                # else:
+                    # print("Admin user already exists ✔")
             else:
                 print("Skipping admin creation — database tables not ready yet.")
         except (OperationalError, ProgrammingError, InterfaceError):

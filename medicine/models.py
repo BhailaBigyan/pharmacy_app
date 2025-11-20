@@ -1,6 +1,7 @@
 from django.db import models
 from supplier.models import Supplier   # link with Supplier app
 
+
 class Medicine(models.Model):
     medicine_id = models.AutoField(primary_key=True)   # custom PK
     name = models.CharField(max_length=100)
@@ -11,6 +12,10 @@ class Medicine(models.Model):
         ("tablet/capsule", "Tablet/Capsule"),
         ("liquid", "Liquid"),
         ("patch", "Patch"),
+        ("dose form", "Dose Form"),
+        ("ointment", "Ointment"),
+        ("syrup", "Syrup"),
+        ("injection", "Injection"),
         ("cream", "Topical Cream"),
     ]
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default="tablet/capsule")
@@ -24,3 +29,7 @@ class Medicine(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.brand_name})"
+    
+
+    def total_price(self):
+        return self.price * self.stock_qty

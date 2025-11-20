@@ -9,7 +9,7 @@ urlpatterns = [
     path('notifications/', views.notifications, name='notifications'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
-    path("register/", views.register_view, name="register"),
+    path('register/', views.company_register, name='company_register'),
     path('forgot-password/', views.forgot_password, name='forgot_password'),
     path('reset-password/<str:token>/', views.reset_password, name='reset_password'),
     #For stock
