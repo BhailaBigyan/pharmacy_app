@@ -80,9 +80,9 @@ WSGI_APPLICATION = 'pharmacy_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
+        'NAME': 'pharmacy_db',  # Change this to your new database name if different
         'USER': 'postgres',
-        'PASSWORD': 'superadmin',
+        'PASSWORD': '1234hero',
         'HOST': 'localhost',   # or your server IP
         'PORT': '5432',
     }

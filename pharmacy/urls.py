@@ -5,7 +5,8 @@ from . import views
 from . import user_urls
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('', views.landing_page, name='landing_page'),
+    path('dashboard/', views.index, name='index'),
     path('notifications/', views.notifications, name='notifications'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),

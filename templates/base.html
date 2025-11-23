@@ -15,13 +15,20 @@
     <!-- Header -->
     <header class="header">
         <div class="header-content">
-            <a href="{% url 'index' %}" class="logo">
-                <i class="bi bi-hospital"></i>
-                <h1>{{ CURRENT_COMPANY.company_name }}</h1>
-                <p style="font-size:small; margin: 0; font-weight: lighter;">
-                    Pharmacy Management System
-                </p>
-            </a>
+            <div class="header-left">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+                    <i class="bi bi-list"></i>
+                </button>
+                <a href="{% url 'index' %}" class="logo">
+                    <i class="bi bi-hospital"></i>
+                    <div class="logo-text">
+                        <h1>{{ CURRENT_COMPANY.company_name }}</h1>
+                        <p style="font-size:small; margin: 0; font-weight: lighter;">
+                            Pharmacy Management System
+                        </p>
+                    </div>
+                </a>
+            </div>
 
             <div class="user-info">
                 <i class="bi bi-person-circle"></i>
@@ -41,7 +48,7 @@
 
                 <span class="user-role">{{ user.get_role_display|default:user.role|title }}</span>
                 <a href="{% url 'logout' %}" class="btn btn-outline-primary btn-sm">
-                    <i class="bi bi-box-arrow-right"></i> Logout
+                    <i class="bi bi-box-arrow-right"></i> <span class="logout-text">Logout</span>
                 </a>
                 {% endif %}
             </div>
@@ -50,9 +57,9 @@
 
     <!-- Navigation -->
     {% if user.is_authenticated %}
-    <nav class="nav-container">
+    <nav class="nav-container" id="navContainer">
         <div class="nav">
-            <ul class="nav-list">
+            <ul class="nav-list" id="navList">
                 {% if user.role == 'admin' %}
                 <li class="nav-item">
                     <a href="{% url 'index' %}"
@@ -144,6 +151,68 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Mobile menu toggle and header height adjustment
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const navContainer = document.getElementById('navContainer');
+            const header = document.querySelector('.header');
+            
+            // Function to adjust navigation position based on header height
+            function adjustNavPosition() {
+                if (header && navContainer) {
+                    const headerHeight = header.offsetHeight;
+                    navContainer.style.top = headerHeight + 'px';
+                    
+                    // Adjust main content padding
+                    const mainContent = document.querySelector('.main-content');
+                    if (mainContent) {
+                        const navHeight = navContainer.offsetHeight;
+                        const totalHeight = headerHeight + navHeight + 20; // 20px buffer
+                        mainContent.style.paddingTop = totalHeight + 'px';
+                    }
+                }
+            }
+            
+            // Adjust on load and resize
+            adjustNavPosition();
+            window.addEventListener('resize', adjustNavPosition);
+            
+            if (mobileMenuToggle && navContainer) {
+                // Only enable mobile menu functionality if hamburger button is visible
+                function isMobile() {
+                    return window.getComputedStyle(mobileMenuToggle).display !== 'none';
+                }
+                
+                mobileMenuToggle.addEventListener('click', function(e) {
+                    if (!isMobile()) return;
+                    e.stopPropagation();
+                    navContainer.classList.toggle('nav-open');
+                    const icon = this.querySelector('i');
+                    if (navContainer.classList.contains('nav-open')) {
+                        icon.classList.remove('bi-list');
+                        icon.classList.add('bi-x');
+                    } else {
+                        icon.classList.remove('bi-x');
+                        icon.classList.add('bi-list');
+                    }
+                    // Recalculate after menu toggle
+                    setTimeout(adjustNavPosition, 100);
+                });
+                
+                // Close menu when clicking outside (only on mobile)
+                document.addEventListener('click', function(event) {
+                    if (isMobile() && !navContainer.contains(event.target) && !mobileMenuToggle.contains(event.target)) {
+                        navContainer.classList.remove('nav-open');
+                        const icon = mobileMenuToggle.querySelector('i');
+                        icon.classList.remove('bi-x');
+                        icon.classList.add('bi-list');
+                        setTimeout(adjustNavPosition, 100);
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>

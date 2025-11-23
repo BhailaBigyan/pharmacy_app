@@ -18,7 +18,7 @@ class PharmacyConfig(AppConfig):
 
                 admin_username = "admin"
                 admin_email = "admin@example.com"
-                admin_password = "Admin@123"
+                admin_password = "admin123"
 
                 if not User.objects.filter(username=admin_username, role="admin").exists():
                     print("Creating default admin user...")
