@@ -13,7 +13,6 @@ class UserForm(UserCreationForm):
         choices=[
             ('admin', 'Admin'),
             ('pharmacist', 'Pharmacist'),
-            ('staff', 'Staff'),
         ],
         required=True
     )
