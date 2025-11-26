@@ -31,6 +31,25 @@ from .decorators import (
 from .forms import UserRegistrationForm
 
 # ============================
+# LANDING PAGE
+# ============================
+
+def landing_page(request):
+    """Landing page view - first view for the site"""
+    if request.method == 'POST' and 'contact_form' in request.POST:
+        # Handle contact form submission
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        company = request.POST.get('company')
+        message = request.POST.get('message')
+        
+        # Here you can send an email or save to database
+        messages.success(request, 'Thank you for your message! We will get back to you soon.')
+        return redirect('landing_page')
+    
+    return render(request, 'landing_page.html')
+
+# ============================
 # USER AUTH VIEWS
 # ============================
 
@@ -58,7 +77,7 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('login')
+    return redirect('landing_page')
 
 
 User = get_user_model()

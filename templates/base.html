@@ -7,21 +7,782 @@
     <title>{% block title %}Pharmacy Management System{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'base_style.css' %}">
-    
+    <style>
+        :root {
+            --primary-blue: #2563eb;
+            --light-blue: #dbeafe;
+            --dark-blue: #1e40af;
+            --white: #ffffff;
+            --light-gray: #f8fafc;
+            --gray: #64748b;
+            --dark-gray: #334155;
+            --black: #0f172a;
+            --border-color: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-gray);
+            color: var(--black);
+            line-height: 1.6;
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--white);
+            border-bottom: 2px solid var(--border-color);
+            padding: 1rem 0;
+            min-height: 80px;
+
+            position: fixed;
+            /* Stick to top */
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1100;
+            /* Higher than nav */
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            flex-wrap: nowrap;
+            min-height: 60px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            cursor: pointer;
+            padding: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .mobile-menu-toggle:hover {
+            color: var(--dark-blue);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-blue);
+            font-weight: bold;
+            font-size: 1.5rem;
+            text-decoration: none;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo:hover {
+            color: var(--dark-blue);
+            text-decoration: none;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-name {
+            color: var(--dark-gray);
+            font-weight: 500;
+        }
+
+        .user-role {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        /* Navigation */
+        .nav-container {
+            background-color: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            min-height: 60px;
+
+            position: fixed;
+            /* Stick below header - will be adjusted by JS */
+            top: 80px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .nav {
+            max-width: 1350px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .nav-list {
+            display: flex;
+            list-style: none;
+            gap: 0;
+            margin: 0;
+            padding: 0;
+            flex-wrap: wrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .nav-item {
+            margin: 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 1.5rem;
+            color: var(--dark-gray);
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .nav-link i {
+            font-size: 1.1rem;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-blue);
+            background-color: var(--light-blue);
+            border-bottom-color: var(--primary-blue);
+        }
+
+        .nav-link.active {
+            color: var(--primary-blue);
+            background-color: var(--light-blue);
+            border-bottom-color: var(--primary-blue);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 180px 1rem 2rem;
+            /* top padding = header + nav height with extra buffer */
+            min-height: calc(100vh - 200px);
+        }
+
+        /* Cards */
+        .card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: var(--light-blue);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            color: var(--dark-blue);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Buttons */
+        .btn {
+            border-radius: 6px;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border: none;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-blue);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--dark-blue);
+            color: var(--white);
+        }
+
+        .btn-secondary {
+            background-color: var(--gray);
+            color: var(--white);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--dark-gray);
+            color: var(--white);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: var(--white);
+        }
+
+        .btn-warning {
+            background-color: var(--warning);
+            color: var(--white);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: var(--white);
+        }
+
+        .btn-outline-primary {
+            background-color: transparent;
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--primary-blue);
+            color: var(--white);
+        }
+
+        /* Tables */
+        .table {
+            background-color: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .table thead th {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            border: none;
+            padding: 1rem;
+            font-weight: 600;
+        }
+
+        .table tbody td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table tbody tr:hover {
+            background-color: var(--light-blue);
+        }
+
+        /* Forms */
+        .form-control {
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            padding: 0.75rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--dark-gray);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Alerts */
+        .alert {
+            border-radius: 6px;
+            border: none;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .alert-danger {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .alert-warning {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .alert-info {
+            background-color: var(--light-blue);
+            color: var(--dark-blue);
+        }
+
+        /* Stats Cards */
+        .stat-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        /* Responsive */
+        /* Tablet and below - adjust navigation padding */
+        @media (max-width: 992px) {
+            .header {
+                min-height: 70px;
+            }
+
+            .header-content {
+                min-height: 50px;
+            }
+
+
+            .nav-link {
+                padding: 1rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .nav-link i {
+                font-size: 1rem;
+            }
+
+            .nav-list {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                scrollbar-width: thin;
+                scrollbar-color: var(--primary-blue) var(--light-blue);
+            }
+
+            .nav-list::-webkit-scrollbar {
+                height: 6px;
+            }
+
+            .nav-list::-webkit-scrollbar-track {
+                background: var(--light-blue);
+            }
+
+            .nav-list::-webkit-scrollbar-thumb {
+                background: var(--primary-blue);
+                border-radius: 3px;
+            }
+
+            .nav-list::-webkit-scrollbar-thumb:hover {
+                background: var(--dark-blue);
+            }
+
+            .main-content {
+                padding-top: 160px;
+            }
+        }
+
+        /* Small tablet and below - further adjustments */
+        @media (max-width: 768px) {
+            .header {
+                padding: 0.75rem 0;
+                min-height: auto;
+            }
+
+            .header-content {
+                flex-wrap: wrap;
+                gap: 0.75rem;
+                min-height: auto;
+            }
+
+            .header-left {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .logo {
+                font-size: 1.2rem;
+                min-width: 0;
+            }
+
+            .logo h1 {
+                font-size: 1.2rem;
+                margin: 0;
+            }
+
+            .logo p {
+                display: none;
+            }
+
+            .user-info {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                font-size: 0.875rem;
+            }
+
+            .user-name {
+                display: none;
+            }
+
+            .user-role {
+                font-size: 0.75rem;
+                padding: 0.2rem 0.5rem;
+            }
+
+            .logout-text {
+                display: none;
+            }
+
+            .btn-outline-primary {
+                padding: 0.375rem 0.5rem;
+            }
+
+            /* Navigation Mobile Styles */
+            .nav-container {
+                transform: translateY(-100%);
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                max-height: calc(100vh - 100px);
+                overflow-y: auto;
+                transition: transform 0.3s ease;
+            }
+
+            .nav-container.nav-open {
+                transform: translateY(0);
+            }
+
+            .nav {
+                padding: 0;
+            }
+
+            .nav-list {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .nav-item {
+                width: 100%;
+            }
+
+            .nav-link {
+                border-bottom: 1px solid var(--border-color);
+                border-left: 3px solid transparent;
+                padding: 1rem 1.5rem;
+                width: 100%;
+                white-space: normal;
+            }
+
+            .nav-link:last-child {
+                border-bottom: none;
+            }
+
+            .nav-link:hover,
+            .nav-link.active {
+                border-left-color: var(--primary-blue);
+                border-bottom-color: var(--border-color);
+                background-color: var(--light-blue);
+            }
+
+            .main-content {
+                padding: 1rem;
+                padding-top: 100px;
+            }
+        }
+
+        /* Small mobile devices */
+        @media (max-width: 480px) {
+            .header-content {
+                padding: 0 0.75rem;
+            }
+
+            .logo {
+                font-size: 1rem;
+            }
+
+            .logo h1 {
+                font-size: 1rem;
+            }
+
+            .user-info {
+                gap: 0.25rem;
+            }
+
+            .nav-link {
+                padding: 0.875rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .main-content {
+                padding: 0.75rem;
+                padding-top: 90px;
+            }
+        }
+
+        /* Extra small devices */
+        @media (max-width: 360px) {
+            .header-content {
+                padding: 0 0.5rem;
+            }
+
+            .logo {
+                font-size: 0.9rem;
+            }
+
+            .logo h1 {
+                font-size: 0.9rem;
+            }
+
+            .user-info {
+                font-size: 0.75rem;
+            }
+
+            .nav-link {
+                padding: 0.75rem 0.875rem;
+                font-size: 0.85rem;
+            }
+
+            .main-content {
+                padding: 0.5rem;
+                padding-top: 85px;
+            }
+        }
+
+        /* Large screens - ensure proper spacing */
+        @media (min-width: 1400px) {
+            .header-content {
+                max-width: 1600px;
+            }
+
+            .nav {
+                max-width: 1500px;
+            }
+
+            .main-content {
+                max-width: 1400px;
+            }
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--white);
+            border-top: 1px solid var(--border-color);
+            padding: 1rem 0;
+            text-align: center;
+            color: var(--gray);
+            margin-top: 2rem;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.3);
+                opacity: 0.6;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .btn .bg-danger {
+            animation: pulse 1.5s infinite;
+        }
+
+        /* ============================
+   SUPER MOBILE RESPONSIVE FIX
+   ============================ */
+
+        /* Phones ≤ 768px */
+        @media (max-width: 768px) {
+
+            body {
+                font-size: 14px;
+                padding: 0;
+            }
+
+            /* Header */
+            .header {
+                padding: 0.5rem 0;
+                min-height: 60px;
+            }
+
+            .header-content {
+                flex-direction: row;
+                justify-content: space-between;
+                padding: 0 0.7rem;
+            }
+
+            .logo {
+                font-size: 1.1rem;
+            }
+
+            .user-info {
+                flex-direction: row;
+                gap: 0.3rem;
+                font-size: 12px;
+            }
+
+            /* Navigation collapses */
+            .nav-container {
+                position: fixed;
+                top: 60px;
+                left: 0;
+                width: 100%;
+                overflow-y: auto;
+                transform: translateY(-100%);
+                transition: 0.3s ease;
+                z-index: 999;
+            }
+
+            .nav-container.nav-open {
+                transform: translateY(0);
+            }
+
+            .nav-list {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .nav-link {
+                width: 100%;
+                padding: 0.8rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            /* Main content spacing */
+            .main-content {
+                padding: 90px 0.8rem 1rem;
+            }
+
+            /* Cards */
+            .card {
+                margin-bottom: 1rem;
+            }
+
+            .card-header,
+            .card-body {
+                padding: 1rem;
+            }
+
+            /* Tables – horizontal scroll */
+            .table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            /* Buttons */
+            .btn {
+                padding: 0.45rem 0.8rem;
+                font-size: 0.85rem;
+            }
+
+            /* Form controls */
+            .form-control {
+                padding: 0.6rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Extra small devices ≤ 480px */
+        @media (max-width: 480px) {
+
+            .logo {
+                font-size: 0.9rem;
+            }
+
+            .main-content {
+                padding: 80px 0.5rem 0.5rem;
+            }
+
+            .nav-link {
+                padding: 0.7rem 0.9rem;
+                font-size: 0.85rem;
+            }
+
+            .form-control {
+                padding: 0.55rem;
+                font-size: 0.85rem;
+            }
+
+            .btn {
+                padding: 0.4rem 0.7rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+
 </head>
+
 <body>
     <!-- Header -->
     <header class="header">
         <div class="header-content">
-            <a href="{% url 'index' %}" class="logo">
-                <i class="bi bi-hospital"></i>
-                <h1>{{ CURRENT_COMPANY.company_name }}</h1>
-                <p style="font-size:small; margin: 0; font-weight: lighter;">
-                    Pharmacy Management System
-                </p>
-            </a>
+            <div class="header-left">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+                    <i class="bi bi-list"></i>
+                </button>
+                <a href="{% url 'index' %}" class="logo">
+                    <i class="bi bi-hospital"></i>
+                    <div class="logo-text">
+                        <h1>{{ CURRENT_COMPANY.company_name }}</h1>
+                        <p style="font-size:small; margin: 0; font-weight: lighter;">
+                            Pharmacy Management System
+                        </p>
+                    </div>
+                </a>
+            </div>
 
             <div class="user-info">
                 <i class="bi bi-person-circle"></i>
@@ -41,7 +802,7 @@
 
                 <span class="user-role">{{ user.get_role_display|default:user.role|title }}</span>
                 <a href="{% url 'logout' %}" class="btn btn-outline-primary btn-sm">
-                    <i class="bi bi-box-arrow-right"></i> Logout
+                    <i class="bi bi-box-arrow-right"></i> <span class="logout-text">Logout</span>
                 </a>
                 {% endif %}
             </div>
@@ -50,9 +811,9 @@
 
     <!-- Navigation -->
     {% if user.is_authenticated %}
-    <nav class="nav-container">
+    <nav class="nav-container" id="navContainer">
         <div class="nav">
-            <ul class="nav-list">
+            <ul class="nav-list" id="navList">
                 {% if user.role == 'admin' %}
                 <li class="nav-item">
                     <a href="{% url 'index' %}"
@@ -62,32 +823,38 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="{% url 'list_medicine' %}" class="nav-link {% if request.resolver_match.url_name == 'list_medicine' %}active{% endif %}">
+                    <a href="{% url 'list_medicine' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'list_medicine' %}active{% endif %}">
                         <i class="bi bi-capsule"></i> Medicines
                     </a>
                 </li>
-               <li class="nav-item">
-                    <a href="{% url 'sales_report' %}" class="nav-link {% if request.resolver_match.url_name == 'sales_report' %}active{% endif %}">
+                <li class="nav-item">
+                    <a href="{% url 'sales_report' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'sales_report' %}active{% endif %}">
                         <i class="bi bi-box-seam"></i> Sales Report
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'stock_report' %}" class="nav-link {% if request.resolver_match.url_name == 'stock_report' %}active{% endif %}">
+                    <a href="{% url 'stock_report' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'stock_report' %}active{% endif %}">
                         <i class="bi bi-box-seam"></i> Stock Report
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'list_supplier' %}" class="nav-link {% if request.resolver_match.url_name == 'list_supplier' %}active{% endif %}">
+                    <a href="{% url 'list_supplier' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'list_supplier' %}active{% endif %}">
                         <i class="bi bi-truck"></i> Suppliers
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'customer_list' %}" class="nav-link {% if request.resolver_match.url_name == 'customer_list' %}active{% endif %}">
+                    <a href="{% url 'customer_list' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'customer_list' %}active{% endif %}">
                         <i class="bi bi-person-lines-fill"></i> Customers
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'user_list' %}" class="nav-link {% if request.resolver_match.url_name == 'user_list' %}active{% endif %}">
+                    <a href="{% url 'user_list' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'user_list' %}active{% endif %}">
                         <i class="bi bi-people"></i> User Management
                     </a>
                 </li>
@@ -99,22 +866,26 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'bill' %}" class="nav-link {% if request.resolver_match.url_name == 'bill' %}active{% endif %}">
+                    <a href="{% url 'bill' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'bill' %}active{% endif %}">
                         <i class="bi bi-calculator"></i> Billing
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'sales_report' %}" class="nav-link {% if request.resolver_match.url_name == 'sales_report' %}active{% endif %}">
+                    <a href="{% url 'sales_report' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'sales_report' %}active{% endif %}">
                         <i class="bi bi-graph-up"></i> Sales Report
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'pharmacist_medicine_list' %}" class="nav-link {% if request.resolver_match.url_name == 'pharmacist_medicine_list' %}active{% endif %}">
+                    <a href="{% url 'pharmacist_medicine_list' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'pharmacist_medicine_list' %}active{% endif %}">
                         <i class="bi bi-capsule"></i> Medicine Management
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'customer_list' %}" class="nav-link {% if request.resolver_match.url_name == 'customer_list' %}active{% endif %}">
+                    <a href="{% url 'customer_list' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'customer_list' %}active{% endif %}">
                         <i class="bi bi-person-lines-fill"></i> Customers
                     </a>
                 </li>
@@ -144,6 +915,68 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Mobile menu toggle and header height adjustment
+        document.addEventListener('DOMContentLoaded', function () {
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const navContainer = document.getElementById('navContainer');
+            const header = document.querySelector('.header');
+
+            // Function to adjust navigation position based on header height
+            function adjustNavPosition() {
+                if (header && navContainer) {
+                    const headerHeight = header.offsetHeight;
+                    navContainer.style.top = headerHeight + 'px';
+
+                    // Adjust main content padding
+                    const mainContent = document.querySelector('.main-content');
+                    if (mainContent) {
+                        const navHeight = navContainer.offsetHeight;
+                        const totalHeight = headerHeight + navHeight + 20; // 20px buffer
+                        mainContent.style.paddingTop = totalHeight + 'px';
+                    }
+                }
+            }
+
+            // Adjust on load and resize
+            adjustNavPosition();
+            window.addEventListener('resize', adjustNavPosition);
+
+            if (mobileMenuToggle && navContainer) {
+                // Only enable mobile menu functionality if hamburger button is visible
+                function isMobile() {
+                    return window.getComputedStyle(mobileMenuToggle).display !== 'none';
+                }
+
+                mobileMenuToggle.addEventListener('click', function (e) {
+                    if (!isMobile()) return;
+                    e.stopPropagation();
+                    navContainer.classList.toggle('nav-open');
+                    const icon = this.querySelector('i');
+                    if (navContainer.classList.contains('nav-open')) {
+                        icon.classList.remove('bi-list');
+                        icon.classList.add('bi-x');
+                    } else {
+                        icon.classList.remove('bi-x');
+                        icon.classList.add('bi-list');
+                    }
+                    // Recalculate after menu toggle
+                    setTimeout(adjustNavPosition, 100);
+                });
+
+                // Close menu when clicking outside (only on mobile)
+                document.addEventListener('click', function (event) {
+                    if (isMobile() && !navContainer.contains(event.target) && !mobileMenuToggle.contains(event.target)) {
+                        navContainer.classList.remove('nav-open');
+                        const icon = mobileMenuToggle.querySelector('i');
+                        icon.classList.remove('bi-x');
+                        icon.classList.add('bi-list');
+                        setTimeout(adjustNavPosition, 100);
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>
