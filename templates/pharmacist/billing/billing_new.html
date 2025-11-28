@@ -730,7 +730,7 @@ document.getElementById('generateInvoice').addEventListener('click', async () =>
     };
 
     try {
-        const response = await fetch('{% url "generate_invoice" %}', {
+        const response = await fetch('{% url "billing:generate_invoice" %}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

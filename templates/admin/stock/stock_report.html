@@ -188,13 +188,13 @@ $(document).ready(function() {
         buttons: [
             { extend: 'excelHtml5', text: '<i class="bi bi-file-excel"></i> Excel', className: 'btn btn-success btn-sm' },
             { extend: 'pdfHtml5', text: '<i class="bi bi-file-pdf"></i> PDF', className: 'btn btn-danger btn-sm' },
-            { extend: 'print', text: '<i class="bi bi-printer"></i> Print', className: 'btn btn-primary btn-sm',
-                customize: function ( win ) {
-                    $(win.document.body).css('font-size', '12px').prepend(
-                        '<h3>Stock Inventory Report</h3><p>Printed: ' + new Date().toLocaleString() + '</p>'
-                    );
-                }
-            }
+            // { extend: 'print', text: '<i class="bi bi-printer"></i> Print', className: 'btn btn-primary btn-sm',
+            //     customize: function ( win ) {
+            //         $(win.document.body).css('font-size', '12px').prepend(
+            //             '<h3>Stock Inventory Report</h3><p>Printed: ' + new Date().toLocaleString() + '</p>'
+            //         );
+            //     }
+            // }
         ]
     });
 

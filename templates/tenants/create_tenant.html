@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Create Tenant{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Create New Tenant</h3>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Tenant Name *</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                            <small class="form-text text-muted">The display name for your pharmacy/tenant</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="domain" class="form-label">Domain *</label>
+                            <input type="text" class="form-control" id="domain" name="domain" required>
+                            <small class="form-text text-muted">Domain name (e.g., mypharmacy.com or localhost for development)</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="schema" class="form-label">Schema Name</label>
+                            <input type="text" class="form-control" id="schema" name="schema" placeholder="auto-generated">
+                            <small class="form-text text-muted">Database schema name (lowercase, alphanumeric + underscores only). Leave empty to auto-generate.</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="tenant_code" class="form-label">Tenant Code *</label>
+                            <input type="text" class="form-control" id="tenant_code" name="tenant_code" required placeholder="unique code (e.g., my_pharmacy)">
+                            <small class="form-text text-muted">Used for tenant verification. Only letters, numbers, dashes or underscores.</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="access_pin" class="form-label">Access PIN *</label>
+                            <input type="password" class="form-control" id="access_pin" name="access_pin" required minlength="4">
+                            <small class="form-text text-muted">Users will enter this PIN to be redirected to their tenant login.</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Create Tenant</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Auto-generate schema name from tenant name
+    const nameInput = document.getElementById('name');
+    const schemaInput = document.getElementById('schema');
+    const codeInput = document.getElementById('tenant_code');
+
+    nameInput.addEventListener('input', function(e) {
+        if (!schemaInput.value) {
+            const schemaName = e.target.value.toLowerCase()
+                .replace(/[^a-z0-9]+/g, '_')
+                .replace(/^_+|_+$/g, '');
+            schemaInput.value = schemaName;
+        }
+        if (!codeInput.value) {
+            const code = e.target.value.toLowerCase()
+                .replace(/[^a-z0-9]+/g, '_')
+                .replace(/^_+|_+$/g, '');
+            codeInput.value = code;
+        }
+    });
+</script>
+{% endblock %}
+

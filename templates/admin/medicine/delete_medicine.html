@@ -5,7 +5,7 @@
   <form method="post">
     {% csrf_token %}
     <button type="submit" class="btn btn-danger">Yes, Delete</button>
-    <a href="{% url 'list_medicine' %}" class="btn btn-secondary">Cancel</a>
+    <a href="{% url 'medicine:list_medicine' %}" class="btn btn-secondary">Cancel</a>
   </form>
 </div>
 {% endblock %}

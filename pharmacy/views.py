@@ -268,7 +268,7 @@ def pharmacist_dashboard(request):
             'amount': float(daily_sales)
         })
 
-    sales_trend.reverse()
+    # sales_trend.reverse()
 
     context = {
         'total_medicines': total_medicines,

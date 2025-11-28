@@ -42,8 +42,8 @@
         .header {
             background-color: var(--white);
             border-bottom: 2px solid var(--border-color);
-            padding: 1rem 0;
-            min-height: 80px;
+            padding: 0.3rem 0;
+            min-height: 60px;
 
             position: fixed;
             /* Stick to top */
@@ -702,7 +702,7 @@
 
             /* Main content spacing */
             .main-content {
-                padding: 90px 0.8rem 1rem;
+                padding: 0px 0rem 0rem;
             }
 
             /* Cards */
@@ -743,7 +743,7 @@
             }
 
             .main-content {
-                padding: 80px 0.5rem 0.5rem;
+                padding: 0px 0rem 0rem;
             }
 
             .nav-link {
@@ -777,9 +777,7 @@
                     <i class="bi bi-hospital"></i>
                     <div class="logo-text">
                         <h1>{{ CURRENT_COMPANY.company_name }}</h1>
-                        <p style="font-size:small; margin: 0; font-weight: lighter;">
-                            Pharmacy Management System
-                        </p>
+                        
                     </div>
                 </a>
             </div>
@@ -823,13 +821,13 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="{% url 'list_medicine' %}"
+                    <a href="{% url 'medicine:list_medicine' %}"
                         class="nav-link {% if request.resolver_match.url_name == 'list_medicine' %}active{% endif %}">
                         <i class="bi bi-capsule"></i> Medicines
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'sales_report' %}"
+                    <a href="{% url 'billing:sales_report' %}"
                         class="nav-link {% if request.resolver_match.url_name == 'sales_report' %}active{% endif %}">
                         <i class="bi bi-box-seam"></i> Sales Report
                     </a>
@@ -847,7 +845,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'customer_list' %}"
+                    <a href="{% url 'billing:customer_list' %}"
                         class="nav-link {% if request.resolver_match.url_name == 'customer_list' %}active{% endif %}">
                         <i class="bi bi-person-lines-fill"></i> Customers
                     </a>
@@ -860,13 +858,13 @@
                 </li>
                 {% elif user.role == 'pharmacist' or user.role == 'staff' %}
                 <li class="nav-item">
-                    <a href="{% url 'pharmacist_dashboard' %}"
+                    <a href="{% url 'pharmacist:pharmacist_dashboard' %}"
                         class="nav-link {% if request.resolver_match.url_name == 'pharmacist_dashboard' %}active{% endif %}">
                         <i class="bi bi-speedometer2"></i> Dashboard
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'bill' %}"
+                    <a href="{% url 'billing:bill' %}"
                         class="nav-link {% if request.resolver_match.url_name == 'bill' %}active{% endif %}">
                         <i class="bi bi-calculator"></i> Billing
                     </a>
@@ -878,14 +876,14 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'pharmacist_medicine_list' %}"
+                    <a href="{% url 'medicine:list_medicine' %}"
                         class="nav-link {% if request.resolver_match.url_name == 'pharmacist_medicine_list' %}active{% endif %}">
                         <i class="bi bi-capsule"></i> Medicine Management
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'customer_list' %}"
-                        class="nav-link {% if request.resolver_match.url_name == 'customer_list' %}active{% endif %}">
+                        <a href="{% url 'billing:customer_list' %}"
+                        class="nav-link">
                         <i class="bi bi-person-lines-fill"></i> Customers
                     </a>
                 </li>

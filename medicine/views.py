@@ -12,7 +12,7 @@ def add_medicine(request):
         form = MedicineForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('list_medicine')
+            return redirect('medicine:list_medicine')
     else:
         form = MedicineForm()
     return render(request, "admin/medicine/add_medicine.html", {"form": form})
@@ -45,7 +45,7 @@ def delete_medicine(request, pk):
     medicine = get_object_or_404(Medicine, pk=pk)
     if request.method == "POST":
         medicine.delete()
-        return redirect('list_medicine')
+        return redirect('medicine:list_medicine')
     return render(request, 'admin/medicine/delete_medicine.html', {'medicine': medicine})
 
 # Update Medicine
@@ -55,7 +55,7 @@ def update_medicine(request, pk):
         form = MedicineForm(request.POST, instance=medicine)
         if form.is_valid():
             form.save()
-            return redirect('list_medicine')
+            return redirect('medicine:list_medicine')
     else:
         form = MedicineForm(instance=medicine)
     return render(request, 'admin/medicine/update_medicine.html', {'form': form})

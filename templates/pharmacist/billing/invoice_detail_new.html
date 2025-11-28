@@ -131,10 +131,10 @@
                         <button onclick="window.print()" class="btn btn-primary">
                             <i class="bi bi-printer"></i> Print Invoice
                         </button>
-                        <a href="{% url 'bill' %}" class="btn btn-success">
+                        <a href="{% url 'billing:bill' %}" class="btn btn-success">
                             <i class="bi bi-plus"></i> New Bill
                         </a>
-                        <a href="{% url 'sales_report' %}" class="btn btn-outline-primary">
+                        <a href="{% url 'billing:sales_report' %}" class="btn btn-outline-primary">
                             <i class="bi bi-graph-up"></i> Sales Report
                         </a>
                     </div>

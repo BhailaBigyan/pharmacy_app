@@ -58,7 +58,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="9" class="text-center">No data available.</td>
+                <td colspan="8" class="text-center">No data available.</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -78,13 +78,6 @@
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
 
 <script>
-    $(document).ready(function () {
-        $('#supplierTable').DataTable({
-            dom: 'Bfrtip',
-            buttons: [
-                'copy', 'excel', 'pdf', 'print'
-            ]
-        });
-    });
+   
 </script>
 {% endblock %}

@@ -107,7 +107,7 @@
                         <a href="{% url 'edit_page_medicine' medicine.medicine_id %}" class="btn btn-warning">
                             <i class="bi bi-pencil"></i> Edit Medicine
                         </a>
-                        <a href="{% url 'list_medicine' %}" class="btn btn-outline-primary">
+                        <a href="{% url 'medicine:list_medicine' %}" class="btn btn-outline-primary">
                             <i class="bi bi-arrow-left"></i> Back to List
                         </a>
                         <a href="{% url 'delete_medicine' medicine.medicine_id %}" class="btn btn-outline-danger">

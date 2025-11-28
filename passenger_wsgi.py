@@ -13,5 +13,6 @@ sys.path.insert(0, PROJECT_PATH)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'pharmacy_app.settings'  # replace 'pharmacy_app.settings' with your actual settings module path
 
 # 4. Setup WSGI application
-from django.core.wsgi import get_wsgi_application
+# django-tenants requires using get_wsgi_application from django_tenants
+from django_tenants.wsgi import get_wsgi_application
 application = get_wsgi_application()

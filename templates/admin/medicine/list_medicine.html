@@ -41,7 +41,7 @@
                                 <button type="submit" class="btn btn-primary">
                                     <i class="bi bi-search"></i> Filter
                                 </button>
-                                <a href="{% url 'list_medicine' %}" class="btn btn-outline-secondary">
+                                <a href="{% url 'medicine:list_medicine' %}" class="btn btn-outline-secondary">
                                     <i class="bi bi-arrow-clockwise"></i> Reset
                                 </a>
                             </div>
@@ -57,12 +57,12 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <a href="{% url 'add_medicine' %}" class="btn btn-success">
+                    <a href="{% url 'medicine:add_medicine' %}" class="btn btn-success">
                         <i class="bi bi-plus"></i> Add Medicine
                     </a>
-                    <button onclick="printTable()" class="btn btn-outline-primary">
+                    <!-- <button onclick="printTable()" class="btn btn-outline-primary">
                         <i class="bi bi-printer"></i> Print
-                    </button>
+                    </button> -->
                 </div>
                 <div>
                     <span class="text-muted">Total: {{ filter.qs.count }} medicines</span>

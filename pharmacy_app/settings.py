@@ -21,13 +21,25 @@ ALLOWED_HOSTS = ['*']
 
 
 # Application definition
-
-INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
+# django-tenants configuration
+SHARED_APPS = [
+    'django_tenants',  # mandatory
+    'tenants',  # you must list the app where your tenant model resides in
     'django.contrib.contenttypes',
+    'django.contrib.auth',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.admin',
+    'django.contrib.staticfiles',
+    'django_filters',
+]
+
+TENANT_APPS = [
+    'django.contrib.contenttypes',
+    'django.contrib.auth',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.admin',
     'django.contrib.staticfiles',
     'django_filters',
     'pharmacy', # Custom user model and authentication
@@ -36,7 +48,11 @@ INSTALLED_APPS = [
     'billing', # For billing management
 ]
 
+INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]
+
 MIDDLEWARE = [
+    'django_tenants.middleware.main.TenantMainMiddleware',  # Must be first
+    'tenants.middleware.TenantActiveMiddleware',  # Check if tenant is active
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -70,16 +86,10 @@ WSGI_APPLICATION = 'pharmacy_app.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+# django-tenants requires PostgreSQL
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django_tenants.postgresql_backend',
         'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': 'superadmin',
@@ -87,6 +97,10 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+
+DATABASE_ROUTERS = (
+    'django_tenants.routers.TenantSyncRouter',
+)
 
 
 # Password validation
@@ -160,3 +174,9 @@ EMAIL_HOST_USER = 'easedpha@easedpharma.com'
 EMAIL_HOST_PASSWORD = '@easedpharma0010PMS'
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# django-tenants settings
+TENANT_MODEL = "tenants.Client"  # app.Model
+TENANT_DOMAIN_MODEL = "tenants.Domain"  # app.Model
+SHOW_PUBLIC_IF_NO_TENANT_FOUND = True
+PUBLIC_SCHEMA_URLCONF = 'pharmacy_app.urls_public'
