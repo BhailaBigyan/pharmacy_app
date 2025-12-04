@@ -60,9 +60,6 @@
                     <a href="{% url 'add_medicine' %}" class="btn btn-success">
                         <i class="bi bi-plus"></i> Add Medicine
                     </a>
-                    <button onclick="printTable()" class="btn btn-outline-primary">
-                        <i class="bi bi-printer"></i> Print
-                    </button>
                 </div>
                 <div>
                     <span class="text-muted">Total: {{ filter.qs.count }} medicines</span>
@@ -146,40 +143,43 @@
         </div>
     </div>
 </div>
+<!-- Include jQuery first -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
 <!-- DataTables CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
 
-<!-- DataTables JavaScript -->
+<!-- DataTables JS -->
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+
+<!-- Buttons JS -->
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
 
 <script>
 $(document).ready(function() {
-    // Initialize DataTable
-    var table = $('#medicineTable').DataTable({
-        "pageLength": 25,
-        "order": [[0, "asc"]],
-        "columnDefs": [
-            { "orderable": false, "targets": 10 } // Disable sorting on Actions column
-        ],
-        "dom": 'Bfrtip',
-        "buttons": [
+    $('#medicineTable').DataTable({
+        dom: 'Bfrtip',
+        buttons: [
             {
-                extend: 'excel',
+                extend: 'copyHtml5',
+                text: '<i class="bi bi-clipboard"></i> Copy',
+                className: 'btn btn-secondary btn-sm'
+            },
+            {
+                extend: 'excelHtml5',
                 text: '<i class="bi bi-file-excel"></i> Excel',
                 className: 'btn btn-success btn-sm'
             },
             {
-                extend: 'pdf',
+                extend: 'pdfHtml5',
                 text: '<i class="bi bi-file-pdf"></i> PDF',
                 className: 'btn btn-danger btn-sm'
             },
@@ -189,40 +189,14 @@ $(document).ready(function() {
                 className: 'btn btn-primary btn-sm'
             }
         ],
-        "language": {
-            "search": "Search medicines:",
-            "lengthMenu": "Show _MENU_ medicines per page",
-            "info": "Showing _START_ to _END_ of _TOTAL_ medicines",
-            "infoEmpty": "No medicines available",
-            "infoFiltered": "(filtered from _MAX_ total medicines)"
-        }
-    });
-
-    // Filter functionality
-    $('#id_name').on('keyup', function() {
-        table.column(1).search(this.value).draw();
-    });
-
-    $('#id_brand_name').on('keyup', function() {
-        table.column(2).search(this.value).draw();
-    });
-
-    $('#id_category').on('change', function() {
-        table.column(3).search(this.value).draw();
-    });
-
-    // Clear filters
-    $('.btn-outline-secondary').on('click', function(e) {
-        if (this.href.includes('list_medicine')) {
-            e.preventDefault();
-            $('#id_name, #id_brand_name, #id_category').val('');
-            table.search('').columns().search('').draw();
-        }
+        "pageLength": 25,
+        "order": [[0, "asc"]],
+        "columnDefs": [
+            { "orderable": false, "targets": 10 } // Actions column
+        ]
     });
 });
-
-function printTable() {
-    window.print();
-}
 </script>
+
+
 {% endblock %}
