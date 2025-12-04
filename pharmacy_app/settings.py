@@ -156,7 +156,7 @@ EMAIL_HOST = 'mail.easedpharma.com'   # Example: mail.easedpharma.com
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 
-EMAIL_HOST_USER = 'easedpha@easedpharma.com'
+EMAIL_HOST_USER = 'noreply@easedpharma.com'
 EMAIL_HOST_PASSWORD = '@easedpharma0010PMS'
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
