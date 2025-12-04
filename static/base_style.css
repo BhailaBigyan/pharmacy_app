@@ -125,7 +125,7 @@
 
             position: fixed;
             /* Stick below header - will be adjusted by JS */
-            top: 80px;
+            top: 80 px;
             left: 0;
             width: 100%;
             z-index: 1000;

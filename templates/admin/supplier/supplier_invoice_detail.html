@@ -1,10 +1,39 @@
 {% extends "base.html" %}
 {% block content %}
+
+<style>
+@media print {
+    .btn, .navbar, .footer {
+        display: none !important;
+    }
+    .container {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse !important;
+        font-size: 12px;
+    }
+    table th, table td {
+        border: 1px solid #000 !important;
+        padding: 4px;
+    }
+    tr {
+        page-break-inside: avoid;
+    }
+    @page {
+        margin: 15mm;
+    }
+}
+</style>
+
 <div class="container my-4">
     <div class="d-flex justify-content-between mb-4">
         <h2>Invoice: {{ invoice.invoice_number }}</h2>
-        <button class="btn btn-primary" onclick="window.print()">🖨 Print</button>
     </div>
+
     <p><strong>Supplier:</strong> {{ invoice.supplier.name }}</p>
     <p><strong>Date:</strong> {{ invoice.date }}</p>
     <p><strong>Received By:</strong> {{ invoice.received_by }}</p>
@@ -36,7 +65,7 @@
                 <td>{{ item.exp_date }}</td>
                 <td>{{ item.quantity }}</td>
                 <td>{{ item.price }}</td>
-                <td></td>
+                <td>{{ item.quantity|floatformat:2|add:item.price }}</td>
             </tr>
             {% endfor %}
             <tr>
@@ -46,4 +75,5 @@
         </tbody>
     </table>
 </div>
+
 {% endblock %}
