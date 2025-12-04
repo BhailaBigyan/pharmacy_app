@@ -148,15 +148,10 @@ AUTH_USER_MODEL = 'pharmacy.User'
 # EMAIL_PORT = 587
 # EMAIL_USE_TLS = True
 # EMAIL_HOST_USER = 'danfetest@gmail.com'  # Your email
-# EMAIL_HOST_PASSWORD = 'uksc hffl crrg fwwy'  # Gmail App Password
+# EMAIL_HOST_PASSWORD = ''  # Gmail App Password
 # DEFAULT_FROM_EMAIL = 'danfetest@gmail.com'
 ADMIN_EMAIL = 'bigyanbhaila98@gmail.com'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'mail.easedpharma.com'   # Example: mail.easedpharma.com
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
-
-EMAIL_HOST_USER = 'noreply@easedpharma.com'
-EMAIL_HOST_PASSWORD = '@easedpharma0010PMS'
-
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
