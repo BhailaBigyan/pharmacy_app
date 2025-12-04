@@ -80,9 +80,9 @@ WSGI_APPLICATION = 'pharmacy_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'superadmin',
+        'NAME': 'easedphar_yukti',
+        'USER': 'easedpha_easeduser',
+        'PASSWORD': '@easedpharma0010PMS',
         'HOST': 'localhost',   # or your server IP
         'PORT': '5432',
     }
